@@ -6,9 +6,16 @@
 // Sets default values
 AItemBase::AItemBase()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	// Assign Mesh
+
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FirstPersonCamera"));
+
+	// Assign IID
+
+	IID = FGuid::NewGuid();
+
 }
 
 // Called when the game starts or when spawned
@@ -24,7 +31,10 @@ void AItemBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-
+[[nodiscard]] FGuid AItemBase::GetID() const
+{
+	return this->IID; 
+}
 void AItemBase::Interact()
 {
 	UE_LOG(LogTemp, Warning, TEXT("[Interaction] Item Interaction Invoked"));

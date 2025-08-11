@@ -5,7 +5,7 @@
 
 // Add default functionality here for any IInteractable functions that are not pure virtual.
 
-void IInteractable::Interact()
+void IInteractable::Interact(FGuid Interactor)
 {
 	UE_LOG(LogTemp, Warning, TEXT("[Interaction]: Default Invocation"));
 }

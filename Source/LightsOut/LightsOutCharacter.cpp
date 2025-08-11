@@ -104,13 +104,10 @@ void ALightsOutCharacter::Look(const FInputActionValue& Value)
 
 void ALightsOutCharacter::Interact(const FInputActionValue& Value)
 {
-	if (CameraScanner->CurrentActor == nullptr)
+	if (CameraScanner->CurrentActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Player Interacted with non-interactable")); 
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Player Interacted with interactable: %s"), *CameraScanner->CurrentActor->GetActorNameOrLabel()); 
+		IInteractable* Interactor = Cast<IInteractable>(CameraScanner->CurrentActor);
+		Interactor->Interact(); 
 	}
 }
 

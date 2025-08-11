@@ -45,17 +45,9 @@ struct FCameraHitScanner
 		World->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Pawn, QueryParams);
 		
 		AActor* tmpActor = HitResult.GetActor(); 
-		if (HitResult.bBlockingHit && IsValid(tmpActor))
+		if (HitResult.bBlockingHit && IsValid(tmpActor) && tmpActor != CurrentActor)
 		{
-			if (CurrentActor != tmpActor && tmpActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
-			{
-				CurrentActor = tmpActor; 
-				UE_LOG(LogTemp, Warning, TEXT("Setting Interactable: %s"), *CurrentActor->GetActorNameOrLabel());
-			}
-			else
-			{
-				CurrentActor = nullptr; 
-			}
+			CurrentActor = tmpActor; 
 		}
 	}
 };

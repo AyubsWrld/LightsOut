@@ -4,7 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "../Generics/Interactable.h"
+#include "LightsOut/Generics/Interactable.h"
+#include "LightsOut/Core/IBSingleton.h"
 #include "Components/StaticMeshComponent.h"
 #include "ItemBase.generated.h"
 
@@ -12,14 +13,17 @@ UCLASS()
 class LIGHTSOUT_API AItemBase : public AActor, public IInteractable
 {
 	GENERATED_BODY()
-	
+
+	UPROPERTY() 
+	FGuid IID; 
+
 public:	
 	// Sets default values for this actor's properties
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Mesh, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* Mesh; 
 	AItemBase();
 
-	virtual void Interact() override; 
+	virtual void Interact(FGuid Interactor) override; 
 
 protected:
 	// Called when the game starts or when spawned
@@ -28,6 +32,8 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	[[nodiscard]] FGuid GetID() const; 
 
 
 };
