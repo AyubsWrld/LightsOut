@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "LightsOut/Items/ItemBase.h" // Fix this later.
 #include "ItemBroker.generated.h"
 
+class AItemBase;
 typedef FGuid IID; 
 typedef FGuid PID; 
 typedef TMap<PID, TArray<AItemBase*>> InvetoryMap; 

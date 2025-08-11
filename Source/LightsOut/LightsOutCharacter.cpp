@@ -107,7 +107,7 @@ void ALightsOutCharacter::Interact(const FInputActionValue& Value)
 	if (CameraScanner->CurrentActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
 	{
 		IInteractable* Interactor = Cast<IInteractable>(CameraScanner->CurrentActor);
-		Interactor->Interact(); 
+		Interactor->Interact(GetActorGuid()); 
 	}
 }
 

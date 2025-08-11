@@ -2,6 +2,7 @@
 
 
 #include "ItemBroker.h"
+#include "LightsOut/Items/ItemBase.h"
 
 // Add default functionality here for any IItemBroker functions that are not pure virtual.
 

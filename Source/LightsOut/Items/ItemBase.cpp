@@ -35,8 +35,10 @@ void AItemBase::Tick(float DeltaTime)
 {
 	return this->IID; 
 }
-void AItemBase::Interact()
+void AItemBase::Interact(FGuid Interactor)
 {
-	UE_LOG(LogTemp, Warning, TEXT("[Interaction] Item Interaction Invoked"));
+	UE_LOG(LogTemp, Warning, TEXT("[Interaction] %s Interacted with Item"), *Interactor.ToString());
+	IBSingleton* singleton = IBSingleton::Get(); 
+	singleton->AddToPlayerInventory(*this, Interactor);
 }
 

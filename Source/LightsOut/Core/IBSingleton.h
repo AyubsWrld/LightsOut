@@ -3,6 +3,7 @@
 #pragma once
 
 #include "LightsOut/Generics/ItemBroker.h"
+#include "LightsOut/Items/ItemBase.h"
 #include "CoreMinimal.h"
 
 /**
@@ -21,13 +22,12 @@ public:
 	IBSingleton(IBSingleton& Other) = delete; 
 
 	void operator=(const IBSingleton&) = delete;
-	~IBSingleton();
 
 
 	static [[nodiscard]] IBSingleton* Get();
 
-	virtual void AddToPlayerInventory(AItemBase& Item, PID PlayerID);
-	virtual void RemoveFromPlayerInventory(AItemBase& Item, PID PlayerID);
-	virtual void DeletePlayerInventory(PID PlayerID);
-	virtual [[nodiscard]] bool PlayerOwnsItem(AItemBase& Item, PID PlayerID) const ;
+	virtual void AddToPlayerInventory(AItemBase& Item, PID PlayerID) override ;
+	virtual void RemoveFromPlayerInventory(AItemBase& Item, PID PlayerID) override;
+	virtual void DeletePlayerInventory(PID PlayerID) override ;
+	virtual [[nodiscard]] bool PlayerOwnsItem(AItemBase& Item, PID PlayerID) const override;
 };
