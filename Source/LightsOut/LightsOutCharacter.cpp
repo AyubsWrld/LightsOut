@@ -3,7 +3,6 @@
 #include "LightsOutCharacter.h"
 #include "LightsOutProjectile.h"
 #include "Animation/AnimInstance.h"
-#include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "EnhancedInputComponent.h"
@@ -34,7 +33,6 @@ ALightsOutCharacter::ALightsOutCharacter()
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
-
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
@@ -67,6 +65,9 @@ void ALightsOutCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ALightsOutCharacter::Look);
+
+		// Interctions
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ALightsOutCharacter::Interact);
 	}
 	else
 	{
@@ -99,4 +100,31 @@ void ALightsOutCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void ALightsOutCharacter::Interact(const FInputActionValue& Value)
+{
+	if (CameraScanner->CurrentActor == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Player Interacted with non-interactable")); 
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Player Interacted with interactable: %s"), *CameraScanner->CurrentActor->GetActorNameOrLabel()); 
+	}
+}
+
+void ALightsOutCharacter::Tick(float Deltatime)
+{
+	CameraScanner->Scan();
+}
+
+void ALightsOutCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	// Initialize Camera hit scanner
+
+	PrimaryActorTick.bCanEverTick = true;
+	/* GC managed? */
+	CameraScanner = new FCameraHitScanner(FirstPersonCameraComponent, GetWorld(), this);
 }

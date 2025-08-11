@@ -5,14 +5,60 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "Camera/CameraComponent.h"
+#include "Generics/Interactable.h"
 #include "LightsOutCharacter.generated.h"
 
 class UInputComponent;
 class USkeletalMeshComponent;
-class UCameraComponent;
 class UInputAction;
 class UInputMappingContext;
 struct FInputActionValue;
+
+struct FCameraHitScanner
+{
+	FHitResult            HitResult; 
+	FVector               Start;
+	FVector               End;
+	FCollisionQueryParams QueryParams;
+
+	UCameraComponent*     Camera       = nullptr ; 
+	UWorld* World                      = nullptr ; 
+	AActor*               CurrentActor = nullptr; 
+
+
+	FCameraHitScanner(UCameraComponent* camera, UWorld* world, AActor* ignored)
+	{
+		Camera = camera;
+		World  = world ;
+		QueryParams.AddIgnoredActor(ignored);
+		UE_LOG(LogTemp, Warning, TEXT("Initialized CameraHitScanner"));
+	}
+
+	void Scan()
+	{
+		if (World == nullptr || Camera == nullptr)
+			return;  // Exception 
+
+		Start = Camera->GetComponentLocation(); 
+		End = Start + Camera->GetForwardVector() * 1000.0f; 
+		World->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Pawn, QueryParams);
+		
+		AActor* tmpActor = HitResult.GetActor(); 
+		if (HitResult.bBlockingHit && IsValid(tmpActor))
+		{
+			if (CurrentActor != tmpActor && tmpActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+			{
+				CurrentActor = tmpActor; 
+				UE_LOG(LogTemp, Warning, TEXT("Setting Interactable: %s"), *CurrentActor->GetActorNameOrLabel());
+			}
+			else
+			{
+				CurrentActor = nullptr; 
+			}
+		}
+	}
+};
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -44,16 +90,28 @@ class ALightsOutCharacter : public ACharacter
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* InteractAction;
+
+	FCameraHitScanner* CameraScanner; 
 	
 public:
 	ALightsOutCharacter();
 
+	virtual void BeginPlay() override;
+	virtual void Tick(float Deltatime) override;
+
 protected:
+
+	void Interact(const FInputActionValue& Value);
+
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
+
 
 protected:
 	// APawn interface
