@@ -1,8 +1,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "LightsOut/Items/ItemBase.h"
 #include "ItemTypes.generated.h"
 
+typedef       FGuid                               IID; 
+typedef       FGuid                               PID; 
+typedef       TMap<PID, TArray<AItemBase*>>       InvetoryMap; 
+typedef       TMap<IID, AItemBase*>               ItemRegistry; 
+typedef       TArray<FVector>                     ItemSpawnPoints; 
 
 UENUM(BlueprintType)
 enum class EItemCategory : uint8
@@ -28,3 +34,9 @@ struct FItemSlot
 	FItemSlot() = default;
 };
 
+UENUM(BlueprintType)
+enum class EItemSpawnConfig : uint8
+{
+	ISC_Default, 
+	ISC_Assorted
+};

@@ -33,6 +33,12 @@ ALightsOutCharacter::ALightsOutCharacter()
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
+
+	// Bind reference to global itembroker instance 
+
+	//ItemBroker = MakeShared<IItemBroker>(GetWorld()->GetSubsystem<UIBSingleton>());
+
+
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
@@ -121,7 +127,10 @@ void ALightsOutCharacter::BeginPlay()
 	Super::BeginPlay();
 	// Initialize Camera hit scanner
 
+
+	ItemBroker = GetWorld()->GetSubsystem<UIBSingleton>();
+
 	PrimaryActorTick.bCanEverTick = true;
-	/* GC managed? */
-	CameraScanner = new FCameraHitScanner(FirstPersonCameraComponent, GetWorld(), this);
+	
+	CameraScanner = MakeUnique<FCameraHitScanner>(FirstPersonCameraComponent, GetWorld(), this);
 }

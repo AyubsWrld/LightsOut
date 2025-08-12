@@ -7,6 +7,9 @@
 #include "Logging/LogMacros.h"
 #include "Camera/CameraComponent.h"
 #include "Generics/Interactable.h"
+#include "Generics/ItemBroker.h"
+#include "Core/IBSingleton.h"
+#include "Templates/SharedPointer.h"
 #include "LightsOutCharacter.generated.h"
 
 class UInputComponent;
@@ -86,7 +89,10 @@ class ALightsOutCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* InteractAction;
 
-	FCameraHitScanner* CameraScanner; 
+
+	TUniquePtr<FCameraHitScanner> CameraScanner; 
+
+	IItemBroker* ItemBroker; 
 	
 public:
 	ALightsOutCharacter();

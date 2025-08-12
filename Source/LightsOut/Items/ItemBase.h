@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "LightsOut/Generics/Interactable.h"
-#include "LightsOut/Core/IBSingleton.h"
 #include "Components/StaticMeshComponent.h"
 #include "ItemBase.generated.h"
 
@@ -34,6 +33,5 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	[[nodiscard]] FGuid GetID() const; 
-
 
 };

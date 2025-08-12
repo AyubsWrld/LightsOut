@@ -4,12 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "LightsOut/Items/ItemTypes.h"
 #include "ItemBroker.generated.h"
-
-class AItemBase;
-typedef FGuid IID; 
-typedef FGuid PID; 
-typedef TMap<PID, TArray<AItemBase*>> InvetoryMap; 
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
@@ -26,12 +22,19 @@ class LIGHTSOUT_API IItemBroker
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
+
 public:
 
 	virtual void AddToPlayerInventory(AItemBase& Item, PID PlayerID);
 	virtual void RemoveFromPlayerInventory(AItemBase& Item, PID PlayerID);
 	virtual void DeletePlayerInventory(PID PlayerID);
+
+	virtual void SpawnItems(UWorld* World);
 	virtual [[nodiscard]] bool PlayerOwnsItem(AItemBase& Item, PID PlayerID) const ;
 	/* virtual [[nodiscard]] const AItemBase& InspectItem(IID ItemID); */
 
+	virtual void SetItemSpawns(ItemSpawnPoints& spawnpoints) ;
+
+	/* Convert to reference later */
+	virtual ItemSpawnPoints* GetItemSpawns() const ;
 };

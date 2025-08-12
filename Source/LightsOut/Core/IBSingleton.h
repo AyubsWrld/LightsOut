@@ -3,31 +3,50 @@
 #pragma once
 
 #include "LightsOut/Generics/ItemBroker.h"
-#include "LightsOut/Items/ItemBase.h"
 #include "CoreMinimal.h"
+#include "Subsystems/WorldSubsystem.h"
+#include "IBSingleton.generated.h"
 
 /**
  * 
  */
-class LIGHTSOUT_API IBSingleton : public IItemBroker
+
+UCLASS()
+class LIGHTSOUT_API UIBSingleton : public UWorldSubsystem, public IItemBroker
 {
+	GENERATED_BODY()
 
 public:
 
-	static IBSingleton* Main ; 
+	static UIBSingleton* Main;
 
-	InvetoryMap PlayerInventoreies;
-	IBSingleton() = default;
+	InvetoryMap     PlayerInventoreies;
+	ItemRegistry    Registry;
+	ItemSpawnPoints SpawnPoints;
 
-	IBSingleton(IBSingleton& Other) = delete; 
+	UIBSingleton(); 
 
-	void operator=(const IBSingleton&) = delete;
+	// Causes C2535: https://learn.microsoft.com/en-us/cpp/error-messages/compiler-errors-2/compiler-error-c2535?view=msvc-170. 
+	/*
+	UIBSingleton(const UIBSingleton& Other) = delete;
+	UIBSingleton& operator=(const UIBSingleton&) = delete;
+	*/
 
+	static [[nodiscard]] UIBSingleton* Get(UWorld* World);
 
-	static [[nodiscard]] IBSingleton* Get();
+	/*
+	template<typename T>
+	static [[nodiscard]] UIBSingleton* GetFrom(T* WorldObjectContext);
+	*/
 
-	virtual void AddToPlayerInventory(AItemBase& Item, PID PlayerID) override ;
+	virtual void AddToPlayerInventory(AItemBase& Item, PID PlayerID) override;
 	virtual void RemoveFromPlayerInventory(AItemBase& Item, PID PlayerID) override;
-	virtual void DeletePlayerInventory(PID PlayerID) override ;
+	virtual void DeletePlayerInventory(PID PlayerID) override;
 	virtual [[nodiscard]] bool PlayerOwnsItem(AItemBase& Item, PID PlayerID) const override;
+
+	virtual void SpawnItems(UWorld* World) override;
+	virtual void SetItemSpawns(ItemSpawnPoints& spawnpoints) override;
+	virtual ItemSpawnPoints* GetItemSpawns() const override;
+
 };
+

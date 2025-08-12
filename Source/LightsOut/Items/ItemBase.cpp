@@ -2,6 +2,7 @@
 
 
 #include "ItemBase.h"
+#include "LightsOut/Core/IBSingleton.h"
 
 // Sets default values
 AItemBase::AItemBase()
@@ -35,10 +36,11 @@ void AItemBase::Tick(float DeltaTime)
 {
 	return this->IID; 
 }
+
 void AItemBase::Interact(FGuid Interactor)
 {
 	UE_LOG(LogTemp, Warning, TEXT("[Interaction] %s Interacted with Item"), *Interactor.ToString());
-	IBSingleton* singleton = IBSingleton::Get(); 
+	UIBSingleton* singleton = GetWorld()->GetSubsystem<UIBSingleton>(); 
 	singleton->AddToPlayerInventory(*this, Interactor);
 }
 
