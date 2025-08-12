@@ -31,12 +31,6 @@ bool IItemBroker::PlayerOwnsItem(AItemBase& Item, PID PlayerID) const
 	return false;
 }
 
-
-void IItemBroker::SetItemSpawns(ItemSpawnPoints& spawnpoints)
-{
-	UE_LOG(LogTemp, Warning, TEXT("Invoked from generic interface"));
-}
-
 ItemSpawnPoints* IItemBroker::GetItemSpawns() const
 {
 	return nullptr;

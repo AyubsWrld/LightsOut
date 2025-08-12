@@ -7,12 +7,14 @@ UIBSingleton* UIBSingleton::Main = nullptr;
 
 
 
-UIBSingleton* UIBSingleton::Get(UWorld* World)
+/*
+UIBSingleton* UIBSingleton::Get()
 {
 	if (!World)
 		return nullptr;
 	return World->GetSubsystem<UIBSingleton>();
 }
+*/
 
 /*
 template<typename T> 
@@ -50,12 +52,6 @@ bool UIBSingleton::PlayerOwnsItem(AItemBase& Item, PID PlayerID) const
 void UIBSingleton::SpawnItems(UWorld* World)
 {
 	UE_LOG(LogTemp, Warning, TEXT("[%s]: Spawning Items"), ANSI_TO_TCHAR(__FUNCTION__));
-}
-
-void UIBSingleton::SetItemSpawns(ItemSpawnPoints& spawnpoints)
-{
-	UIBSingleton* instance = UIBSingleton::Get(GetWorld()); 
-	instance->SpawnPoints = spawnpoints;
 }
 
 ItemSpawnPoints* UIBSingleton::GetItemSpawns() const

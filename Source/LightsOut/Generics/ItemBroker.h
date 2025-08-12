@@ -32,9 +32,6 @@ public:
 	virtual void SpawnItems(UWorld* World);
 	virtual [[nodiscard]] bool PlayerOwnsItem(AItemBase& Item, PID PlayerID) const ;
 	/* virtual [[nodiscard]] const AItemBase& InspectItem(IID ItemID); */
-
-	virtual void SetItemSpawns(ItemSpawnPoints& spawnpoints) ;
-
 	/* Convert to reference later */
 	virtual ItemSpawnPoints* GetItemSpawns() const ;
 };

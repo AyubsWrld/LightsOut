@@ -32,7 +32,7 @@ public:
 	UIBSingleton& operator=(const UIBSingleton&) = delete;
 	*/
 
-	static [[nodiscard]] UIBSingleton* Get(UWorld* World);
+	/*static [[nodiscard]] UIBSingleton* Get();*/
 
 	/*
 	template<typename T>
@@ -45,7 +45,7 @@ public:
 	virtual [[nodiscard]] bool PlayerOwnsItem(AItemBase& Item, PID PlayerID) const override;
 
 	virtual void SpawnItems(UWorld* World) override;
-	virtual void SetItemSpawns(ItemSpawnPoints& spawnpoints) override;
+
 	virtual ItemSpawnPoints* GetItemSpawns() const override;
 
 };
