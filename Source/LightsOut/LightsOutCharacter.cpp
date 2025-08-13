@@ -108,13 +108,32 @@ void ALightsOutCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
+void ALightsOutCharacter::HandleInteractionRequest_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("User Interacted"));
+	if (!CameraScanner || !CameraScanner->CurrentActor)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("CamerScanner doesn't Exist"));
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("[%s]: Player Location( X: %f, Y: %f, Z: %f)"), ANSI_TO_TCHAR(__FUNCTION__),
+		CameraScanner->CurrentActor->GetActorLocation().X,
+		CameraScanner->CurrentActor->GetActorLocation().Y,
+		CameraScanner->CurrentActor->GetActorLocation().Z
+	);
+
+	AActor* Target = CameraScanner->CurrentActor;
+	if (Target->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+	{
+
+		if (IInteractable* I = Cast<IInteractable>(Target)) { I->Interact(GetActorGuid()); }
+	}
+}
+
 void ALightsOutCharacter::Interact(const FInputActionValue& Value)
 {
-	if (CameraScanner->CurrentActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
-	{
-		IInteractable* Interactor = Cast<IInteractable>(CameraScanner->CurrentActor);
-		Interactor->Interact(GetActorGuid()); 
-	}
+	HandleInteractionRequest();
 }
 
 void ALightsOutCharacter::Tick(float Deltatime)

@@ -39,14 +39,18 @@ public:
 	static [[nodiscard]] UIBSingleton* GetFrom(T* WorldObjectContext);
 	*/
 
+	void OnWorldBeginPlay(UWorld& InWorld) override;
 	virtual void AddToPlayerInventory(AItemBase& Item, PID PlayerID) override;
 	virtual void RemoveFromPlayerInventory(AItemBase& Item, PID PlayerID) override;
 	virtual void DeletePlayerInventory(PID PlayerID) override;
 	virtual [[nodiscard]] bool PlayerOwnsItem(AItemBase& Item, PID PlayerID) const override;
 
+	UFUNCTION(NetMulticast, Reliable)
 	virtual void SpawnItems(UWorld* World) override;
 
 	virtual ItemSpawnPoints* GetItemSpawns() const override;
+
+	virtual bool ShouldCreateSubsystem(UObject* Outer) const override;
 
 };
 

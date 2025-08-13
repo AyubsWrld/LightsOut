@@ -102,6 +102,9 @@ public:
 
 protected:
 
+	UFUNCTION(Server, Reliable)
+	void HandleInteractionRequest();
+
 	void Interact(const FInputActionValue& Value);
 
 	/** Called for movement input */

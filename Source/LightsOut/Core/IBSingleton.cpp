@@ -1,33 +1,16 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+
 #include "IBSingleton.h"
 
 
 UIBSingleton* UIBSingleton::Main = nullptr;
-
-
-
-/*
-UIBSingleton* UIBSingleton::Get()
+void UIBSingleton::OnWorldBeginPlay(UWorld& InWorld)
 {
-	if (!World)
-		return nullptr;
-	return World->GetSubsystem<UIBSingleton>();
+	if (InWorld.GetNetMode() == ENetMode::NM_Client)
+		return;
+	SpawnItems(&InWorld);
 }
-*/
-
-/*
-template<typename T> 
-UIBSingleton* UIBSingleton::GetFrom(T* WorldObjectContext)
-{
-	if (!WorldContextObject) { return nullptr; }
-	if (UWorld* World = WorldContextObject->GetWorld())
-	{
-		return World->GetSubsystem<UIBSingleton>();
-	}
-	return nullptr;
-}
-*/
 
 void UIBSingleton::AddToPlayerInventory(AItemBase& Item, PID PlayerID)
 {
@@ -49,9 +32,28 @@ bool UIBSingleton::PlayerOwnsItem(AItemBase& Item, PID PlayerID) const
 	return false;
 }
 
-void UIBSingleton::SpawnItems(UWorld* World)
+void UIBSingleton::SpawnItems_Implementation(UWorld* World)
 {
 	UE_LOG(LogTemp, Warning, TEXT("[%s]: Spawning Items"), ANSI_TO_TCHAR(__FUNCTION__));
+	if (!World) return;
+
+	if (World->GetNetMode() == NM_Client) return; // safety
+
+	TArray<FVector> Spawns = {
+		FVector(1330.f,  920.f, 50.f),
+		FVector(1330.f, 1130.f, 50.f),
+		FVector(1330.f,  600.f, 50.f)
+	};
+
+	TSubclassOf<AItemBase> ItemClass = AItemBase::StaticClass();
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride =
+		ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	for (const FVector& Loc : Spawns)
+	{
+		AItemBase* Item = World->SpawnActor<AItemBase>(ItemClass, Loc, FRotator::ZeroRotator, Params);
+	}
 }
 
 ItemSpawnPoints* UIBSingleton::GetItemSpawns() const
@@ -59,11 +61,15 @@ ItemSpawnPoints* UIBSingleton::GetItemSpawns() const
 	return nullptr;
 }
 
+bool UIBSingleton::ShouldCreateSubsystem(UObject* Outer) const
+{
+	const UWorld* World = Cast<UWorld>(Outer);
+	if (!World || !World->IsGameWorld()) return false;
+
+	const ENetMode NM = World->GetNetMode();
+	return (NM == NM_DedicatedServer || NM == NM_ListenServer);
+}
+
 UIBSingleton::UIBSingleton()
 {
-	ItemSpawnPoints Spawns = {
-		FVector(1330.0f, 920.0f, 0.0),
-		FVector(1330.0f, 1130.0f, 0.0),
-		FVector(1330.0f, 600.0f, 0.0)
-	};
 }
