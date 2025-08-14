@@ -11,10 +11,22 @@ void UIBSingleton::OnWorldBeginPlay(UWorld& InWorld)
 		return;
 	MulticastSpawnItems(&InWorld);
 }
-
 void UIBSingleton::AddToPlayerInventory(AItemBase& Item, PID PlayerID)
 {
-	UE_LOG(LogTemp, Warning, TEXT("[%s]: Adding (IID: %s) to Player(%s) Inventory"), ANSI_TO_TCHAR(__FUNCTION__), *Item.GetID().ToString(), *PlayerID.ToString());
+	if (GetWorld()->GetNetMode() != ENetMode::NM_DedicatedServer) // sanity
+		return; 
+
+	/* Create the player a new inventory, Should this be done when they attempt to pick up their first item?*/
+	if (!PlayerInventories.Contains(PlayerID))
+		PlayerInventories.Add(PlayerID, TArray<AItemBase*>());
+
+	TArray<AItemBase*>& Inventory = PlayerInventories[PlayerID];
+	Inventory.AddUnique(&Item); // Const lvalue reference to 
+
+	for (auto item : Inventory)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *item->GetActorGuid().ToString());
+	}
 }
 
 void UIBSingleton::RemoveFromPlayerInventory(AItemBase& Item, PID PlayerID)

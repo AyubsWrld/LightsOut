@@ -20,7 +20,7 @@ public:
 
 	static UIBSingleton* Main;
 
-	InvetoryMap     PlayerInventoreies;
+	InventoryMap     PlayerInventories;
 	ItemRegistry    Registry;
 	ItemSpawnPoints SpawnPoints;
 

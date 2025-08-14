@@ -6,7 +6,7 @@
 
 typedef       FGuid                               IID; 
 typedef       FGuid                               PID; 
-typedef       TMap<PID, TArray<AItemBase*>>       InvetoryMap; 
+typedef       TMap<PID, TArray<AItemBase*>>       InventoryMap; 
 typedef       TMap<IID, AItemBase*>               ItemRegistry; 
 typedef       TArray<FVector>                     ItemSpawnPoints; 
 
