@@ -9,7 +9,7 @@ void UIBSingleton::OnWorldBeginPlay(UWorld& InWorld)
 {
 	if (InWorld.GetNetMode() == ENetMode::NM_Client)
 		return;
-	SpawnItems(&InWorld);
+	MulticastSpawnItems(&InWorld);
 }
 
 void UIBSingleton::AddToPlayerInventory(AItemBase& Item, PID PlayerID)
@@ -32,7 +32,7 @@ bool UIBSingleton::PlayerOwnsItem(AItemBase& Item, PID PlayerID) const
 	return false;
 }
 
-void UIBSingleton::SpawnItems_Implementation(UWorld* World)
+void UIBSingleton::MulticastSpawnItems_Implementation(UWorld* World)
 {
 	UE_LOG(LogTemp, Warning, TEXT("[%s]: Spawning Items"), ANSI_TO_TCHAR(__FUNCTION__));
 	if (!World) return;

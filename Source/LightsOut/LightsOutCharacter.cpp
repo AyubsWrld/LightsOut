@@ -26,6 +26,7 @@ ALightsOutCharacter::ALightsOutCharacter()
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
+
 	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
 	Mesh1P->SetOnlyOwnerSee(true);
@@ -108,32 +109,33 @@ void ALightsOutCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
-void ALightsOutCharacter::HandleInteractionRequest_Implementation()
+void ALightsOutCharacter::ServerHandleInteractionRequest_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("User Interacted"));
-	if (!CameraScanner || !CameraScanner->CurrentActor)
+	FHitResult HitResult; 
+	FCollisionQueryParams Parameters; 
+
+	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	FRotator Rotation = PlayerController->GetControlRotation().GetNormalized();
+	Parameters.AddIgnoredActor(this);
+
+	FVector Start = FirstPersonCameraComponent->GetComponentLocation();
+	FVector End = Start + Rotation.Vector() * 1000.0f; 
+
+	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Pawn, Parameters);
+
+	AActor* HitActor = HitResult.GetActor();
+	if (HitResult.bBlockingHit && IsValid(HitActor) && HitActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("CamerScanner doesn't Exist"));
-		return;
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("[%s]: Player Location( X: %f, Y: %f, Z: %f)"), ANSI_TO_TCHAR(__FUNCTION__),
-		CameraScanner->CurrentActor->GetActorLocation().X,
-		CameraScanner->CurrentActor->GetActorLocation().Y,
-		CameraScanner->CurrentActor->GetActorLocation().Z
-	);
-
-	AActor* Target = CameraScanner->CurrentActor;
-	if (Target->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
-	{
-
-		if (IInteractable* I = Cast<IInteractable>(Target)) { I->Interact(GetActorGuid()); }
+		IInteractable* Interactable = Cast<IInteractable>(HitActor);
+		Interactable->Interact(GetActorGuid()); // Perhaps we can deduce actor guid elsewhere? or maybe global delegate the interaction. 
 	}
 }
 
 void ALightsOutCharacter::Interact(const FInputActionValue& Value)
 {
-	HandleInteractionRequest();
+	FRotator Rotation = FirstPersonCameraComponent->GetComponentRotation();
+	UE_LOG(LogTemp, Warning, TEXT("%f, %f, %f"), Rotation.Roll, Rotation.Pitch, Rotation.Yaw);
+	ServerHandleInteractionRequest();
 }
 
 void ALightsOutCharacter::Tick(float Deltatime)
@@ -153,3 +155,4 @@ void ALightsOutCharacter::BeginPlay()
 	
 	CameraScanner = MakeUnique<FCameraHitScanner>(FirstPersonCameraComponent, GetWorld(), this);
 }
+

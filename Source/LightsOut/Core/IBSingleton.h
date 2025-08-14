@@ -46,7 +46,7 @@ public:
 	virtual [[nodiscard]] bool PlayerOwnsItem(AItemBase& Item, PID PlayerID) const override;
 
 	UFUNCTION(NetMulticast, Reliable)
-	virtual void SpawnItems(UWorld* World) override;
+	virtual void MulticastSpawnItems(UWorld* World) override;
 
 	virtual ItemSpawnPoints* GetItemSpawns() const override;
 

@@ -53,6 +53,11 @@ struct FCameraHitScanner
 			CurrentActor = tmpActor; 
 		}
 	}
+
+	UCameraComponent* GetCamera()
+	{
+		return Camera;
+	}
 };
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -69,7 +74,6 @@ class ALightsOutCharacter : public ACharacter
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCameraComponent;
-
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
@@ -89,7 +93,6 @@ class ALightsOutCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* InteractAction;
 
-
 	TUniquePtr<FCameraHitScanner> CameraScanner; 
 
 	IItemBroker* ItemBroker; 
@@ -103,7 +106,7 @@ public:
 protected:
 
 	UFUNCTION(Server, Reliable)
-	void HandleInteractionRequest();
+	void ServerHandleInteractionRequest(); 
 
 	void Interact(const FInputActionValue& Value);
 

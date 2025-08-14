@@ -20,7 +20,7 @@ void IItemBroker::DeletePlayerInventory(PID PlayerID)
 	UE_LOG(LogTemp, Warning, TEXT("Invoked from generic interface"));
 }
 
-void IItemBroker::SpawnItems(UWorld* World)
+void IItemBroker::MulticastSpawnItems(UWorld* World)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Invoked from generic interface"));
 }

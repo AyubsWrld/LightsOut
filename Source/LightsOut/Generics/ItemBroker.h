@@ -29,7 +29,7 @@ public:
 	virtual void RemoveFromPlayerInventory(AItemBase& Item, PID PlayerID);
 	virtual void DeletePlayerInventory(PID PlayerID);
 
-	virtual void SpawnItems(UWorld* World);
+	virtual void MulticastSpawnItems(UWorld* World);
 	virtual [[nodiscard]] bool PlayerOwnsItem(AItemBase& Item, PID PlayerID) const ;
 	/* virtual [[nodiscard]] const AItemBase& InspectItem(IID ItemID); */
 	/* Convert to reference later */
