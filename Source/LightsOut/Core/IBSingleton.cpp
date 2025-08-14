@@ -5,6 +5,14 @@
 
 
 UIBSingleton* UIBSingleton::Main = nullptr;
+
+
+void DespawnItem(AActor& Item)
+{
+	Item.SetActorHiddenInGame(true);
+	Item.SetActorEnableCollision(false);
+	Item.SetActorTickEnabled(false);
+}
 void UIBSingleton::OnWorldBeginPlay(UWorld& InWorld)
 {
 	if (InWorld.GetNetMode() == ENetMode::NM_Client)
@@ -23,10 +31,7 @@ void UIBSingleton::AddToPlayerInventory(AItemBase& Item, PID PlayerID)
 	TArray<AItemBase*>& Inventory = PlayerInventories[PlayerID];
 	Inventory.AddUnique(&Item); // Const lvalue reference to 
 
-	for (auto item : Inventory)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *item->GetActorGuid().ToString());
-	}
+	DespawnItem(Item);
 }
 
 void UIBSingleton::RemoveFromPlayerInventory(AItemBase& Item, PID PlayerID)
@@ -85,3 +90,4 @@ bool UIBSingleton::ShouldCreateSubsystem(UObject* Outer) const
 UIBSingleton::UIBSingleton()
 {
 }
+

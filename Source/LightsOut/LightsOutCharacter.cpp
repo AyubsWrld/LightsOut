@@ -119,7 +119,7 @@ void ALightsOutCharacter::ServerHandleInteractionRequest_Implementation()
 	Parameters.AddIgnoredActor(this);
 
 	FVector Start = FirstPersonCameraComponent->GetComponentLocation();
-	FVector End = Start + Rotation.Vector() * 1000.0f; 
+	FVector End = Start + Rotation.Vector() * 300.0f; 
 
 	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Pawn, Parameters);
 
