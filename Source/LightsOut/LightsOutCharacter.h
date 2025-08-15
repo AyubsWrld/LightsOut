@@ -9,6 +9,7 @@
 #include "Generics/Interactable.h"
 #include "Generics/ItemBroker.h"
 #include "Core/IBSingleton.h"
+#include "LightsOut/UI/HUD/LightsOutCharacterHUD.h"
 #include "Templates/SharedPointer.h"
 #include "LightsOutCharacter.generated.h"
 
@@ -86,12 +87,20 @@ class ALightsOutCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
 
+	UPROPERTY(EditAnywhere, Category=UI);
+	UUserWidget* PlayerHUD;
+
+	UPROPERTY(EditAnywhere, Category=UI)
+	TSubclassOf<ULightsOutCharacterHUD> PlayerHUDClassReference; 
+
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* InteractAction;
+
+
 
 	TUniquePtr<FCameraHitScanner> CameraScanner; 
 

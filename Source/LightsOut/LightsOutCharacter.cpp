@@ -140,7 +140,11 @@ void ALightsOutCharacter::Interact(const FInputActionValue& Value)
 
 void ALightsOutCharacter::Tick(float Deltatime)
 {
-	CameraScanner->Scan();
+	/* 
+		Why does having this within IsLocallyControlled cause compilation errors?,
+		Actor ticks are called on the server as well, this is nullptr. unless locally relevant. 
+	*/
+	CameraScanner->Scan(); 
 }
 
 void ALightsOutCharacter::BeginPlay()
@@ -150,9 +154,23 @@ void ALightsOutCharacter::BeginPlay()
 
 
 	ItemBroker = GetWorld()->GetSubsystem<UIBSingleton>();
-
 	PrimaryActorTick.bCanEverTick = true;
-	
 	CameraScanner = MakeUnique<FCameraHitScanner>(FirstPersonCameraComponent, GetWorld(), this);
+
+	/* Why? Explain this */
+	if (IsLocallyControlled() && Controller)
+	{
+		APlayerController* PlayerController = Cast<APlayerController>(Controller);
+		PlayerHUD = CreateWidget<ULightsOutCharacterHUD>(PlayerController, PlayerHUDClassReference);
+		if (PlayerHUD)
+		{
+			PlayerHUD->AddToPlayerScreen();
+			auto tmp = Cast<ULightsOutCharacterHUD>(PlayerHUD);
+			if (tmp)
+				tmp->SetItemSlot();
+			return; 
+		}
+		UE_LOG(LogTemp, Error, TEXT("Undefined HUD"));
+	}
 }
 
