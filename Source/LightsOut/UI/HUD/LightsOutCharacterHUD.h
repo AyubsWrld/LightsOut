@@ -14,7 +14,7 @@
 /**
  *
  */
-UCLASS(Abstract)
+UCLASS()
 class LIGHTSOUT_API ULightsOutCharacterHUD : public UUserWidget
 {
 	GENERATED_BODY()
@@ -31,29 +31,38 @@ class LIGHTSOUT_API ULightsOutCharacterHUD : public UUserWidget
 	};
 
 	UPROPERTY(meta = (BindWidget))
-	UNamedSlot* ItemSlot_0;
+	UWidget* ItemSlot_0;
+
 	UPROPERTY(meta = (BindWidget))
-	UImage* ItemSlot_0_Image;
+	UWidget* ItemSlot_0_Image;
+
 	UPROPERTY(meta = (BindWidget))
-	UNamedSlot* ItemSlot_1;
+	UWidget* ItemSlot_1;
+
 	UPROPERTY(meta = (BindWidget))
-	UImage* ItemSlot_1_Image;
+	UWidget* ItemSlot_1_Image;
+
 	UPROPERTY(meta = (BindWidget))
-	UNamedSlot* ItemSlot_2;
+	UWidget* ItemSlot_2;
+
 	UPROPERTY(meta = (BindWidget))
-	UImage* ItemSlot_2_Image;
+	UWidget* ItemSlot_2_Image;
+
 	UPROPERTY(meta = (BindWidget))
-	UNamedSlot* ItemSlot_3;
+	UWidget* ItemSlot_3;
+
 	UPROPERTY(meta = (BindWidget))
-	UImage* ItemSlot_3_Image;
+	UWidget* ItemSlot_3_Image;
+
+	UPROPERTY(meta = (BindWidget))
+	UWidget* RHorizontalBox;
+
+	UPROPERTY(meta = (BindWidget))
+	UWidget* MainPanel;
 
 protected:
-	// Called when the widget is constructed
-	virtual void NativeConstruct() override;
 
 private:
-	// Helper function to get image widget by index
-	UImage* GetImageWidgetByIndex(int32 SlotIndex) const;
 
 public:
 	/* Wrapper around SetContentForSlot */
@@ -61,24 +70,4 @@ public:
 	void RorderItems(const AItemBase& Item, int Index);
 	bool [[nodiscard]] IsWellFormed() const; // Invariance check; 
 
-	// Function to set image brush for a specific slot
-	void SetSlotImage(int32 SlotIndex, UTexture2D* ItemTexture);
-
-	// Function to clear a slot image
-	void ClearSlotImage(int32 SlotIndex);
-
-	// Function to set image using item data
-	void SetSlotImageFromItem(int32 SlotIndex, const AItemBase* Item);
-
-	// Set all slots to a default color
-	void SetAllSlotsToDefaultColor(FLinearColor Color = FLinearColor::Gray);
-
-	// Set a specific slot to a color
-	void SetSlotToColor(int32 SlotIndex, FLinearColor Color);
-
-	// Set all slots to transparent/hidden
-	void ClearAllSlots();
-
-	// Highlight/unhighlight a specific slot
-	void SetHighlightSlot(int32 SlotIndex, bool bHighlight);
 };

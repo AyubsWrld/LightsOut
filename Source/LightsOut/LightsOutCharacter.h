@@ -91,7 +91,7 @@ class ALightsOutCharacter : public ACharacter
 	UUserWidget* PlayerHUD;
 
 	UPROPERTY(EditAnywhere, Category=UI)
-	TSubclassOf<ULightsOutCharacterHUD> PlayerHUDClassReference; 
+	TSubclassOf<UUserWidget> PlayerHUDClassReference; 
 
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
