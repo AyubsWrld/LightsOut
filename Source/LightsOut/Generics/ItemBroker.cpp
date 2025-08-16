@@ -5,9 +5,10 @@
 
 // Add default functionality here for any IItemBroker functions that are not pure virtual.
 
-void IItemBroker::AddToPlayerInventory(AItemBase& Item, PID PlayerID)
+[[nodiscard]] bool IItemBroker::TryAddToPlayerInventory(AItemBase& Item, PID PlayerID)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Invoked from generic interface"));
+	return false ;
 }
 
 void IItemBroker::RemoveFromPlayerInventory(AItemBase& Item , PID PlayerID)
@@ -25,7 +26,7 @@ void IItemBroker::MulticastSpawnItems(UWorld* World)
 	UE_LOG(LogTemp, Warning, TEXT("Invoked from generic interface"));
 }
 
-bool IItemBroker::PlayerOwnsItem(AItemBase& Item, PID PlayerID) const
+[[nodiscard]] bool IItemBroker::PlayerOwnsItem(AItemBase& Item, PID PlayerID) const
 {
 	UE_LOG(LogTemp, Warning, TEXT("Invoked from generic interface"));
 	return false;

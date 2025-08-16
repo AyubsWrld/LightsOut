@@ -100,6 +100,17 @@ class ALightsOutCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* InteractAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* EquipSlotZeroAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* EquipSlotOneAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* EquipSlotTwoAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* EquipSlotThreeAction;
 
 
 	TUniquePtr<FCameraHitScanner> CameraScanner; 
@@ -117,7 +128,16 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerHandleInteractionRequest(); 
 
+
+	UFUNCTION(Client, Reliable)
+	void ClientUpdateHUD(AItemBase* Item); 
+
 	void Interact(const FInputActionValue& Value);
+
+	void EquipSlot0(const FInputActionValue& Value);
+	void EquipSlot1(const FInputActionValue& Value);
+	void EquipSlot2(const FInputActionValue& Value);
+	void EquipSlot3(const FInputActionValue& Value);
 
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);

@@ -4,17 +4,18 @@
 #include "Blueprint/UserWidget.h"
 #include "LightsOut/Items/ItemTypes.h"
 #include "LightsOut/Items/ItemBase.h"
-#include "Components/NamedSlot.h"
 #include "Styling/SlateBrush.h"
 #include "Components/Image.h"
 #include "LightsOutCharacterHUD.generated.h"
 
-#define MAX_NUM_SLOTS 4 
+#define MAX_INVENTORY_SIZE 4 
 
 /**
  *
  */
+
 UCLASS()
+
 class LIGHTSOUT_API ULightsOutCharacterHUD : public UUserWidget
 {
 	GENERATED_BODY()
@@ -22,13 +23,7 @@ class LIGHTSOUT_API ULightsOutCharacterHUD : public UUserWidget
 	UPROPERTY(EditAnywhere)
 	TArray<FItemSlot> ItemSlots;
 
-	const FName SlotNames[4] =
-	{
-		TEXT("ItemSlot_0"),
-		TEXT("ItemSlot_1"),
-		TEXT("ItemSlot_2"),
-		TEXT("ItemSlot_3")
-	};
+	const AItemBase* Items[4]{};
 
 	UPROPERTY(meta = (BindWidget))
 	UWidget* ItemSlot_0;
@@ -60,14 +55,39 @@ class LIGHTSOUT_API ULightsOutCharacterHUD : public UUserWidget
 	UPROPERTY(meta = (BindWidget))
 	UWidget* MainPanel;
 
+	UPROPERTY(EditAnywhere)
+	UTexture2D* DefaultTex;
+
+	UWidget* CurrentActive{};
+
 protected:
 
 private:
 
 public:
+
+	void UpdateHUD(const AItemBase* Item);
+
 	/* Wrapper around SetContentForSlot */
+
 	void SetItemSlot();
+
 	void RorderItems(const AItemBase& Item, int Index);
-	bool [[nodiscard]] IsWellFormed() const; // Invariance check; 
+
+	[[nodiscard]] bool IsWellFormed() const; // Invariance check; 
+	
+	[[nodiscard]] UImage* GetImageAtIndex(int32 Index) const;
+
+	[[nodiscard]] UWidget* GetSlotAtIndex(int32 Index) const;
+
+	[[nodiscard]] int32 GetEmptySlot() const;
+
+	void RemoveAtIndex(int32 Index);
+
+	void DebugItemSlot(int32 index);
+
+	virtual void NativeConstruct() override; 
+
+	ULightsOutCharacterHUD(const FObjectInitializer& ObjectInitializer);
 
 };

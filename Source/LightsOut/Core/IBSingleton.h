@@ -5,6 +5,7 @@
 #include "LightsOut/Generics/ItemBroker.h"
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
+#include "Engine/Engine.h"
 #include "IBSingleton.generated.h"
 
 /**
@@ -40,10 +41,14 @@ public:
 	*/
 
 	void OnWorldBeginPlay(UWorld& InWorld) override;
-	virtual void AddToPlayerInventory(AItemBase& Item, PID PlayerID) override;
+
+	[[nodiscard]] virtual bool TryAddToPlayerInventory(AItemBase& Item, PID PlayerID) override;
+
+	[[nodiscard]] virtual bool PlayerOwnsItem(AItemBase& Item, PID PlayerID) const override;
+
 	virtual void RemoveFromPlayerInventory(AItemBase& Item, PID PlayerID) override;
+
 	virtual void DeletePlayerInventory(PID PlayerID) override;
-	virtual [[nodiscard]] bool PlayerOwnsItem(AItemBase& Item, PID PlayerID) const override;
 
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MulticastSpawnItems(UWorld* World) override;

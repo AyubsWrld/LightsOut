@@ -25,12 +25,13 @@ class LIGHTSOUT_API IItemBroker
 
 public:
 
-	virtual void AddToPlayerInventory(AItemBase& Item, PID PlayerID);
+	[[nodiscard]] virtual bool TryAddToPlayerInventory(AItemBase& Item, PID PlayerID);
+
+	[[nodiscard]] virtual bool PlayerOwnsItem(AItemBase& Item, PID PlayerID) const ;
 	virtual void RemoveFromPlayerInventory(AItemBase& Item, PID PlayerID);
 	virtual void DeletePlayerInventory(PID PlayerID);
 
 	virtual void MulticastSpawnItems(UWorld* World);
-	virtual [[nodiscard]] bool PlayerOwnsItem(AItemBase& Item, PID PlayerID) const ;
 	/* virtual [[nodiscard]] const AItemBase& InspectItem(IID ItemID); */
 	/* Convert to reference later */
 	virtual ItemSpawnPoints* GetItemSpawns() const ;

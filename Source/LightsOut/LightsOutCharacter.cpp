@@ -75,6 +75,14 @@ void ALightsOutCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 		// Interctions
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ALightsOutCharacter::Interact);
+
+		// Equip Items 
+
+		EnhancedInputComponent->BindAction(EquipSlotZeroAction, ETriggerEvent::Triggered, this, &ALightsOutCharacter::EquipSlot0);
+		EnhancedInputComponent->BindAction(EquipSlotOneAction, ETriggerEvent::Triggered, this, &ALightsOutCharacter::EquipSlot1);
+		EnhancedInputComponent->BindAction(EquipSlotTwoAction, ETriggerEvent::Triggered, this, &ALightsOutCharacter::EquipSlot2);
+		EnhancedInputComponent->BindAction(EquipSlotThreeAction, ETriggerEvent::Triggered, this, &ALightsOutCharacter::EquipSlot3);
+
 	}
 	else
 	{
@@ -128,6 +136,7 @@ void ALightsOutCharacter::ServerHandleInteractionRequest_Implementation()
 	{
 		IInteractable* Interactable = Cast<IInteractable>(HitActor);
 		Interactable->Interact(GetActorGuid()); // Perhaps we can deduce actor guid elsewhere? or maybe global delegate the interaction. 
+		ClientUpdateHUD(Cast<AItemBase>(Interactable));
 	}
 }
 
@@ -136,6 +145,51 @@ void ALightsOutCharacter::Interact(const FInputActionValue& Value)
 	FRotator Rotation = FirstPersonCameraComponent->GetComponentRotation();
 	UE_LOG(LogTemp, Warning, TEXT("%f, %f, %f"), Rotation.Roll, Rotation.Pitch, Rotation.Yaw);
 	ServerHandleInteractionRequest();
+}
+
+void ALightsOutCharacter::EquipSlot0(const FInputActionValue& Value)
+{
+	/* ... Server Validation RPC ... */
+	check(PlayerHUD);
+	if (!PlayerHUD)
+		return; 
+	Cast<ULightsOutCharacterHUD>(PlayerHUD)->DebugItemSlot(0);
+}
+
+void ALightsOutCharacter::EquipSlot1(const FInputActionValue& Value)
+{
+	/* ... Server Validation RPC ... */
+	check(PlayerHUD);
+	if (!PlayerHUD)
+		return; 
+	Cast<ULightsOutCharacterHUD>(PlayerHUD)->DebugItemSlot(1);
+}
+
+void ALightsOutCharacter::EquipSlot2(const FInputActionValue& Value)
+{
+	/* ... Server Validation RPC ... */
+
+	check(PlayerHUD);
+	if (!PlayerHUD)
+		return; 
+	Cast<ULightsOutCharacterHUD>(PlayerHUD)->DebugItemSlot(2);
+}
+
+void ALightsOutCharacter::EquipSlot3(const FInputActionValue& Value)
+{
+	/* ... Server Validation RPC ... */
+	check(PlayerHUD);
+	if (!PlayerHUD)
+		return; 
+	Cast<ULightsOutCharacterHUD>(PlayerHUD)->DebugItemSlot(3);
+}
+
+void ALightsOutCharacter::ClientUpdateHUD_Implementation(AItemBase* Item)
+{
+	if (!PlayerHUD)
+		return;
+	ULightsOutCharacterHUD* HUD = Cast<ULightsOutCharacterHUD>(PlayerHUD); 
+	HUD->UpdateHUD(Item);
 }
 
 void ALightsOutCharacter::Tick(float Deltatime)

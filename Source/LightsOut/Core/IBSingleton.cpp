@@ -13,16 +13,18 @@ void DespawnItem(AActor& Item)
 	Item.SetActorEnableCollision(false);
 	Item.SetActorTickEnabled(false);
 }
+
 void UIBSingleton::OnWorldBeginPlay(UWorld& InWorld)
 {
 	if (InWorld.GetNetMode() == ENetMode::NM_Client)
 		return;
 	MulticastSpawnItems(&InWorld);
 }
-void UIBSingleton::AddToPlayerInventory(AItemBase& Item, PID PlayerID)
+
+[[nodiscard]] bool UIBSingleton::TryAddToPlayerInventory(AItemBase& Item, PID PlayerID)
 {
 	if (GetWorld()->GetNetMode() != ENetMode::NM_DedicatedServer) // sanity
-		return; 
+		return false; 
 
 	/* Create the player a new inventory, Should this be done when they attempt to pick up their first item?*/
 	if (!PlayerInventories.Contains(PlayerID))
@@ -30,8 +32,8 @@ void UIBSingleton::AddToPlayerInventory(AItemBase& Item, PID PlayerID)
 
 	TArray<AItemBase*>& Inventory = PlayerInventories[PlayerID];
 	Inventory.AddUnique(&Item); // Const lvalue reference to 
-
 	DespawnItem(Item);
+	return true; 
 }
 
 void UIBSingleton::RemoveFromPlayerInventory(AItemBase& Item, PID PlayerID)
@@ -44,7 +46,7 @@ void UIBSingleton::DeletePlayerInventory(PID PlayerID)
 	UE_LOG(LogTemp, Warning, TEXT("Deleting from player inventory"));
 }
 
-bool UIBSingleton::PlayerOwnsItem(AItemBase& Item, PID PlayerID) const
+[[nodiscard]] bool UIBSingleton::PlayerOwnsItem(AItemBase& Item, PID PlayerID) const
 {
 	return false;
 }

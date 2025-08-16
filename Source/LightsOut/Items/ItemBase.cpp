@@ -54,7 +54,15 @@ void AItemBase::Tick(float DeltaTime)
 
 void AItemBase::Interact(FGuid Interactor)
 {
+	/* Should be executing within the context of the server */
+	if (GetNetMode() == ENetMode::NM_Client)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[%s]: Executing within client context"), ANSI_TO_TCHAR(__FUNCTION__));
+		return;
+	}
+
 	UE_LOG(LogTemp, Warning, TEXT("[Interaction] %s Interacted with Item"), *Interactor.ToString());
 	UIBSingleton* singleton = GetWorld()->GetSubsystem<UIBSingleton>();
-	singleton->AddToPlayerInventory(*this, Interactor);
+	if (singleton->TryAddToPlayerInventory(*this, Interactor))
+		return; 
 }
