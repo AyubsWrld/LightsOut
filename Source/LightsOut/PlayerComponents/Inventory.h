@@ -7,13 +7,15 @@
 #include "LightsOut/Items/ItemTypes.h"
 #include "Inventory.generated.h"
 
+
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class LIGHTSOUT_API UInventory : public UActorComponent
 {
 	GENERATED_BODY()
 
-	/* Having a uniqueptr calls the destructor on the object it references when the pointer goes out of scope */
-	//TArray<TWeakPtr<AItemBase>> Items{}; 
+	/* Easiest approach would just be to have the server validate the item later on*/
+	TArray<AItemBase*> Items{}; 
 
 	UPROPERTY(EditAnywhere)
 	int32 ActiveItem{};
@@ -30,11 +32,13 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void AddItem(const AItemBase& Item); 
+	void AddItem(const AItemBase* Item); 
 
 	void EquipItem(int32 Index) ;
 
 	void DiscardItem(int32 Index);
+
+	AItemBase* GetItemAtIndex(int32 Index) const;
 
 	// void SwapItems(int32 Index);
 

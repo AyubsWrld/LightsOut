@@ -10,7 +10,7 @@
 #include "Generics/ItemBroker.h"
 #include "Core/IBSingleton.h"
 #include "LightsOut/UI/HUD/LightsOutCharacterHUD.h"
-#include "Templates/SharedPointer.h"
+#include "LightsOut/PlayerComponents/Inventory.h"
 #include "LightsOutCharacter.generated.h"
 
 class UInputComponent;
@@ -93,6 +93,9 @@ class ALightsOutCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, Category=UI)
 	TSubclassOf<UUserWidget> PlayerHUDClassReference; 
 
+	UPROPERTY(EditAnywhere, Category=Inventory)
+	UInventory* PlayerInventory{};
+
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
@@ -132,6 +135,11 @@ protected:
 	UFUNCTION(Client, Reliable)
 	void ClientUpdateHUD(AItemBase* Item); 
 
+	UFUNCTION(Client, Reliable)
+	void ClientUpdateInventory(AItemBase* Item);
+
+	UFUNCTION(Server, Reliable)
+	void ServerHandleEquipRequest(AItemBase* Item);
 	void Interact(const FInputActionValue& Value);
 
 	void EquipSlot0(const FInputActionValue& Value);

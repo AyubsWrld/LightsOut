@@ -57,8 +57,8 @@ void AItemBase::Interact(FGuid Interactor)
 		return;
 	}
 
-	UIBSingleton* singleton = GetWorld()->GetSubsystem<UIBSingleton>();
-	if (singleton->TryAddToPlayerInventory(*this, Interactor))
+	UIBSingleton* ItemBroker = GetWorld()->GetSubsystem<UIBSingleton>();
+	if (ItemBroker->TryAddToPlayerInventory(*this, Interactor))
 		return; 
 }
 

@@ -34,6 +34,9 @@ bool UIBSingleton::TryAddToPlayerInventory(AItemBase& Item, PID PlayerID)
 
 	TArray<AItemBase*>& Inventory = PlayerInventories[PlayerID];
 	Inventory.AddUnique(&Item); // Const lvalue reference to 
+
+	for (auto Item : PlayerInventories[PlayerID])
+		UE_LOG(LogTemp, Warning, TEXT("[%s]: %s"), ANSI_TO_TCHAR(__FUNCTION__), *Item->GetActorGuid().ToString());
 	DespawnItem(Item);
 	return true; 
 }

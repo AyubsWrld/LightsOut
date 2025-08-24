@@ -63,7 +63,8 @@ struct FItemGenerator
 	}
 	void SpawnItems(UWorld* World, TArray<AItemBase*>& out)
 	{
-		for (int i{}; const auto& loc : SpawnLocations.Get())
+		const auto& Locations = SpawnLocations.Get();
+		for (int i{}; const auto& loc : Locations)
 		{
 			out.Add(SpawnItem(static_cast<EItemCategory>(rand() % ItemCategoryMax), *World, loc));
 		}

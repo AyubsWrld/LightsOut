@@ -134,12 +134,23 @@ void ALightsOutCharacter::ServerHandleInteractionRequest_Implementation()
 	AActor* HitActor = HitResult.GetActor();
 	if (HitResult.bBlockingHit && IsValid(HitActor) && HitActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
 	{
+		/* This is atomic and should be wrapped into a single call */
 		IInteractable* Interactable = Cast<IInteractable>(HitActor);
 		Interactable->Interact(GetActorGuid()); // Perhaps we can deduce actor guid elsewhere? or maybe global delegate the interaction. 
-		UE_LOG(LogTemp, Warning, TEXT("[%s]: Passing interactable"), ANSI_TO_TCHAR(__FUNCTION__));
 		ClientUpdateHUD(Cast<AItemBase>(Interactable));
 	}
 }
+
+void ALightsOutCharacter::ServerHandleEquipRequest_Implementation(AItemBase* Item)
+{
+	if (!Item)
+		return;
+	if (ItemBroker->PlayerOwnsItem(*Item, GetActorGuid())) // Just make this a pointer
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[%s]: Player can equip item %s"), ANSI_TO_TCHAR(__FUNCTION__), *Item->GetActorGuid().ToString());
+	}
+}
+
 
 void ALightsOutCharacter::Interact(const FInputActionValue& Value)
 {
@@ -152,12 +163,12 @@ void ALightsOutCharacter::EquipSlot0(const FInputActionValue& Value)
 {
 	/* ... Server Validation RPC ... */
 	check(PlayerHUD);
-	if (!PlayerHUD)
+	if (!PlayerHUD || !PlayerInventory )
 		return; 
 	Cast<ULightsOutCharacterHUD>(PlayerHUD)->DebugItemSlot(0);
 	if (ItemBroker)
 	{
-		/* ... Do Some Work Here ... */
+		ServerHandleEquipRequest(PlayerInventory->GetItemAtIndex(0));
 	}
 }
 
@@ -189,6 +200,12 @@ void ALightsOutCharacter::EquipSlot3(const FInputActionValue& Value)
 	Cast<ULightsOutCharacterHUD>(PlayerHUD)->DebugItemSlot(3);
 }
 
+void ALightsOutCharacter::ClientUpdateInventory_Implementation(AItemBase* Item)
+{
+	if (!PlayerInventory || !Item)
+		return;
+	PlayerInventory->AddItem(Item);
+}
 void ALightsOutCharacter::ClientUpdateHUD_Implementation(AItemBase* Item)
 {
 	UE_LOG(LogTemp, Warning, TEXT("[%s]: Updating Client HUD"), ANSI_TO_TCHAR(__FUNCTION__));
@@ -204,7 +221,7 @@ void ALightsOutCharacter::Tick(float Deltatime)
 		Why does having this within IsLocallyControlled cause compilation errors?,
 		Actor ticks are called on the server as well, this is nullptr. unless locally relevant. 
 	*/
-	CameraScanner->Scan(); 
+	//CameraScanner->Scan();
 }
 
 void ALightsOutCharacter::BeginPlay()

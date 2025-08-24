@@ -30,7 +30,7 @@ void UInventory::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	// ...
 }
 
-void UInventory::AddItem(const AItemBase& Item)
+void UInventory::AddItem(const AItemBase* Item)
 {
 	/*
 	if (Items.Num() < MAX_ITEMS)
@@ -41,16 +41,16 @@ void UInventory::AddItem(const AItemBase& Item)
 
 void UInventory::EquipItem(int32 Index)
 {
-	/*
-	if(!Items.IsValidIndex(Index))
-		return;
+}
 
-	TSharedPtr<AItemBase> tmp = Items[Index].Pin(); 
-	if (!tmp)
-		return;
-
-	UE_LOG(LogTemp, Warning, TEXT("Equipping Item %d: %s"), Index, *(tmp->GetID().ToString()) );
-	*/
+AItemBase* UInventory::GetItemAtIndex(int32 Index) const
+{
+	if (Items.IsValidIndex(Index))
+	{
+		if (AItemBase* Temp{Items[Index]}; Temp)
+			return Temp; 
+	}
+	return{};
 }
 
 void UInventory::DiscardItem(int32 Index)
