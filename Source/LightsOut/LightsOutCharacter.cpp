@@ -136,6 +136,7 @@ void ALightsOutCharacter::ServerHandleInteractionRequest_Implementation()
 	{
 		IInteractable* Interactable = Cast<IInteractable>(HitActor);
 		Interactable->Interact(GetActorGuid()); // Perhaps we can deduce actor guid elsewhere? or maybe global delegate the interaction. 
+		UE_LOG(LogTemp, Warning, TEXT("[%s]: Passing interactable"), ANSI_TO_TCHAR(__FUNCTION__));
 		ClientUpdateHUD(Cast<AItemBase>(Interactable));
 	}
 }
@@ -154,6 +155,10 @@ void ALightsOutCharacter::EquipSlot0(const FInputActionValue& Value)
 	if (!PlayerHUD)
 		return; 
 	Cast<ULightsOutCharacterHUD>(PlayerHUD)->DebugItemSlot(0);
+	if (ItemBroker)
+	{
+		/* ... Do Some Work Here ... */
+	}
 }
 
 void ALightsOutCharacter::EquipSlot1(const FInputActionValue& Value)
@@ -186,7 +191,8 @@ void ALightsOutCharacter::EquipSlot3(const FInputActionValue& Value)
 
 void ALightsOutCharacter::ClientUpdateHUD_Implementation(AItemBase* Item)
 {
-	if (!PlayerHUD)
+	UE_LOG(LogTemp, Warning, TEXT("[%s]: Updating Client HUD"), ANSI_TO_TCHAR(__FUNCTION__));
+	if (!PlayerHUD || !Item)
 		return;
 	ULightsOutCharacterHUD* HUD = Cast<ULightsOutCharacterHUD>(PlayerHUD); 
 	HUD->UpdateHUD(Item);

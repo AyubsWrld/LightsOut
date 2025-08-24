@@ -97,8 +97,25 @@ void ULightsOutCharacterHUD::DebugItemSlot(int32 Index)
 }
 
 
-void ULightsOutCharacterHUD::UpdateHUD(const AItemBase* Item)
+void ULightsOutCharacterHUD::UpdateHUD(AItemBase* Item)
 {
+    if (!Item)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[%s]: Invalid ptr to item"), ANSI_TO_TCHAR(__FUNCTION__));
+        return;
+    }
+
+	UE_LOG(LogTemp, Warning, TEXT("[%s]: Valid ptr to item"), ANSI_TO_TCHAR(__FUNCTION__));
+
+    switch( Item->GetType())
+    {
+    case EItemCategory::IC_Undefined: 
+        UE_LOG(LogTemp, Warning, TEXT("[%s]: Undefined"), ANSI_TO_TCHAR(__FUNCTION__));
+
+    case EItemCategory::IC_LightSource:
+        UE_LOG(LogTemp, Warning, TEXT("[%s]: LightSource"), ANSI_TO_TCHAR(__FUNCTION__));
+    }
+
     int32 Index = GetEmptySlot();
     if (Index != -1)
     {
@@ -112,16 +129,18 @@ void ULightsOutCharacterHUD::UpdateHUD(const AItemBase* Item)
 
         // Use default white texture from engine resources
 
-        if (DefaultTex)
+        UTexture2D* Icon = Item->GetIcon();
+        if (!Icon)
         {
-            ItemImage->SetBrushFromTexture(DefaultTex, true);
-            Items[Index] = Item; 
+            UE_LOG(LogTemp, Warning, TEXT("Item Icon Undef"));
+            ItemImage->SetBrushFromTexture(DefaultIcon, true);
         }
         else
         {
-            UE_LOG(LogTemp, Warning, TEXT("Default texture not found"));
+            ItemImage->SetBrushFromTexture(Icon, true);
         }
 
+		Items[Index] = Item; 
         return;
     }
 

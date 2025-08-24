@@ -55,8 +55,9 @@ class LIGHTSOUT_API ULightsOutCharacterHUD : public UUserWidget
 	UPROPERTY(meta = (BindWidget))
 	UWidget* MainPanel;
 
-	UPROPERTY(EditAnywhere)
-	UTexture2D* DefaultTex;
+	UPROPERTY(EditAnywhere, Category=Iconography)
+	UTexture2D* DefaultIcon; // Nullify for checking. 
+
 
 	UWidget* CurrentActive{};
 
@@ -66,7 +67,7 @@ private:
 
 public:
 
-	void UpdateHUD(const AItemBase* Item);
+	void UpdateHUD(AItemBase* Item);
 
 	/* Wrapper around SetContentForSlot */
 

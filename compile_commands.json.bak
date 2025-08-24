@@ -1,0 +1,152 @@
+[
+	{
+		"file": "E:/LightsOut/Intermediate/Build/Win64/UnrealEditor/Inc/LightsOut/UHT/IBSingleton.gen.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/IBSingleton.gen.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/IBSingleton.gen.cpp.obj"
+	},
+	{
+		"file": "E:/LightsOut/Intermediate/Build/Win64/UnrealEditor/Inc/LightsOut/UHT/Interactable.gen.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/Interactable.gen.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/Interactable.gen.cpp.obj"
+	},
+	{
+		"file": "E:/LightsOut/Intermediate/Build/Win64/UnrealEditor/Inc/LightsOut/UHT/ItemBase.gen.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/ItemBase.gen.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/ItemBase.gen.cpp.obj"
+	},
+	{
+		"file": "E:/LightsOut/Intermediate/Build/Win64/UnrealEditor/Inc/LightsOut/UHT/ItemBroker.gen.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/ItemBroker.gen.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/ItemBroker.gen.cpp.obj"
+	},
+	{
+		"file": "E:/LightsOut/Intermediate/Build/Win64/UnrealEditor/Inc/LightsOut/UHT/ItemTypes.gen.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/ItemTypes.gen.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/ItemTypes.gen.cpp.obj"
+	},
+	{
+		"file": "E:/LightsOut/Intermediate/Build/Win64/UnrealEditor/Inc/LightsOut/UHT/LightsOut.init.gen.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOut.init.gen.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOut.init.gen.cpp.obj"
+	},
+	{
+		"file": "E:/LightsOut/Intermediate/Build/Win64/UnrealEditor/Inc/LightsOut/UHT/LightsOutCharacter.gen.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOutCharacter.gen.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOutCharacter.gen.cpp.obj"
+	},
+	{
+		"file": "E:/LightsOut/Intermediate/Build/Win64/UnrealEditor/Inc/LightsOut/UHT/LightsOutCharacterHUD.gen.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOutCharacterHUD.gen.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOutCharacterHUD.gen.cpp.obj"
+	},
+	{
+		"file": "E:/LightsOut/Intermediate/Build/Win64/UnrealEditor/Inc/LightsOut/UHT/LightsOutGameMode.gen.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOutGameMode.gen.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOutGameMode.gen.cpp.obj"
+	},
+	{
+		"file": "E:/LightsOut/Intermediate/Build/Win64/UnrealEditor/Inc/LightsOut/UHT/LightsOutPickUpComponent.gen.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOutPickUpComponent.gen.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOutPickUpComponent.gen.cpp.obj"
+	},
+	{
+		"file": "E:/LightsOut/Intermediate/Build/Win64/UnrealEditor/Inc/LightsOut/UHT/LightsOutProjectile.gen.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOutProjectile.gen.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOutProjectile.gen.cpp.obj"
+	},
+	{
+		"file": "E:/LightsOut/Intermediate/Build/Win64/UnrealEditor/Inc/LightsOut/UHT/LightsOutWeaponComponent.gen.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOutWeaponComponent.gen.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOutWeaponComponent.gen.cpp.obj"
+	},
+	{
+		"file": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/PerModuleInline.gen.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/PerModuleInline.gen.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/PerModuleInline.gen.cpp.obj"
+	},
+	{
+		"file": "E:/LightsOut/Source/LightsOut/Core/IBSingleton.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/IBSingleton.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/IBSingleton.cpp.obj"
+	},
+	{
+		"file": "E:/LightsOut/Source/LightsOut/Generics/Interactable.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/Interactable.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/Interactable.cpp.obj"
+	},
+	{
+		"file": "E:/LightsOut/Source/LightsOut/Generics/ItemBroker.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/ItemBroker.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/ItemBroker.cpp.obj"
+	},
+	{
+		"file": "E:/LightsOut/Source/LightsOut/Items/ItemBase.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/ItemBase.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/ItemBase.cpp.obj"
+	},
+	{
+		"file": "E:/LightsOut/Source/LightsOut/Items/ItemTyping.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/ItemTyping.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/ItemTyping.cpp.obj"
+	},
+	{
+		"file": "E:/LightsOut/Source/LightsOut/LightsOut.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOut.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOut.cpp.obj"
+	},
+	{
+		"file": "E:/LightsOut/Source/LightsOut/LightsOutCharacter.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOutCharacter.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOutCharacter.cpp.obj"
+	},
+	{
+		"file": "E:/LightsOut/Source/LightsOut/LightsOutGameMode.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOutGameMode.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOutGameMode.cpp.obj"
+	},
+	{
+		"file": "E:/LightsOut/Source/LightsOut/LightsOutPickUpComponent.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOutPickUpComponent.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOutPickUpComponent.cpp.obj"
+	},
+	{
+		"file": "E:/LightsOut/Source/LightsOut/LightsOutProjectile.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOutProjectile.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOutProjectile.cpp.obj"
+	},
+	{
+		"file": "E:/LightsOut/Source/LightsOut/LightsOutWeaponComponent.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOutWeaponComponent.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOutWeaponComponent.cpp.obj"
+	},
+	{
+		"file": "E:/LightsOut/Source/LightsOut/UI/HUD/LightsOutCharacterHUD.cpp",
+		"command": "\"C:/Program Files/LLVM/bin/clang-cl.exe\" @\"E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOutCharacterHUD.cpp.obj.rsp\" ",
+		"directory": "E:/UE_5.5/Engine/Source",
+		"output": "E:/LightsOut/Intermediate/Build/Win64/x64/UnrealEditor/Development/LightsOut/LightsOutCharacterHUD.cpp.obj"
+	}
+]

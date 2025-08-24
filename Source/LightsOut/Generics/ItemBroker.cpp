@@ -5,6 +5,7 @@
 
 // Add default functionality here for any IItemBroker functions that are not pure virtual.
 
+/* These should all be made to be Server RPCs */
 [[nodiscard]] bool IItemBroker::TryAddToPlayerInventory(AItemBase& Item, PID PlayerID)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Invoked from generic interface"));

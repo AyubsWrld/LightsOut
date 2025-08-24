@@ -1,0 +1,50 @@
+{
+    "version" : "0.0.2",
+    "_comment": "E:\\UE_5.5\\",    
+    "EngineDir": "",
+    "Targets":  [
+        {
+            "TargetName" : "LightsOut-Editor",
+            "Configuration" : "DebugGame",
+            "withEditor" : true,
+            "UbtExtraFlags" : "",
+            "PlatformName" : "Win64"
+        },
+        {
+            "TargetName" : "LightsOut",
+            "Configuration" : "DebugGame",
+            "withEditor" : false,
+            "UbtExtraFlags" : "",
+            "PlatformName" : "Win64"
+        },
+        {
+            "TargetName" : "LightsOut-Editor",
+            "Configuration" : "Development",
+            "withEditor" : true,
+            "UbtExtraFlags" : "",
+            "PlatformName" : "Win64"
+        },
+        {
+            "TargetName" : "LightsOut",
+            "Configuration" : "Development",
+            "withEditor" : false,
+            "UbtExtraFlags" : "",
+            "PlatformName" : "Win64"
+        },
+        {
+            "TargetName" : "LightsOut-Editor",
+            "Configuration" : "Shipping",
+            "withEditor" : true,
+            "UbtExtraFlags" : "",
+            "PlatformName" : "Win64"
+        },
+        {
+            "TargetName" : "LightsOut",
+            "Configuration" : "Shipping",
+            "withEditor" : false,
+            "UbtExtraFlags" : "",
+            "PlatformName" : "Win64"
+        }
+    ]
+}
+    

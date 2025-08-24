@@ -3,14 +3,72 @@
 #pragma once
 
 #include "LightsOut/Generics/ItemBroker.h"
+#include "LightsOut/Items/LightSource.h"
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "Engine/Engine.h"
+#include "type_traits"
 #include "IBSingleton.generated.h"
 
 /**
  * 
  */
+
+/* Functor for generating Items */
+
+struct FSpawnLocations
+{
+	TArray<FVector> SpawnLocations
+	{
+		FVector(1330.f,  920.f, 50.f),
+		FVector(1330.f, 1130.f, 50.f),
+		FVector(1330.f,  600.f, 50.f)
+	};
+
+	const TArray<FVector>& Get() const
+	{ 
+		return SpawnLocations; 
+	}
+};
+
+struct FItemGenerator
+{
+	static constexpr auto ItemCategoryMax{ static_cast<std::underlying_type_t<EItemCategory>>(EItemCategory::IC_MAX_BOUND)};
+
+	FSpawnLocations SpawnLocations{};
+	AItemBase* SpawnItem(EItemCategory ItemType, UWorld& World, const FVector& Location)
+	{
+		//static constexpr auto ItemCategoryMax{ static_cast<std::underlying_type_t<EItemCategory>>(EItemCategory::IC_MAX_BOUND)};
+		switch (ItemType)
+		{
+		case EItemCategory::IC_Undefined :
+			UE_LOG(LogTemp, Warning, TEXT("[%s]: Spawning Undefined"), ANSI_TO_TCHAR(__FUNCTION__));
+			return World.SpawnActor<AItemBase>(Location, FRotator::ZeroRotator); 
+		case EItemCategory::IC_AudioTool :
+			UE_LOG(LogTemp, Warning, TEXT("[%s]: Generating AudioTool"), ANSI_TO_TCHAR(__FUNCTION__));
+			return World.SpawnActor<AItemBase>(Location, FRotator::ZeroRotator); 
+		case EItemCategory::IC_LightSource:
+			UE_LOG(LogTemp, Warning, TEXT("[%s]: Generating LightSource"), ANSI_TO_TCHAR(__FUNCTION__));
+			return World.SpawnActor<AItemBase>(Location, FRotator::ZeroRotator); 
+		case EItemCategory::IC_Medical :
+			UE_LOG(LogTemp, Warning, TEXT("[%s]: Generating Medical"), ANSI_TO_TCHAR(__FUNCTION__));
+			return World.SpawnActor<AItemBase>(Location, FRotator::ZeroRotator); 
+		case EItemCategory::IC_Special :
+			UE_LOG(LogTemp, Warning, TEXT("[%s]: Generating Special"), ANSI_TO_TCHAR(__FUNCTION__));
+			return World.SpawnActor<AItemBase>(Location, FRotator::ZeroRotator); 
+		default:
+			UE_LOG(LogTemp, Warning, TEXT("[%s]: Generating Undefined"), ANSI_TO_TCHAR(__FUNCTION__));
+			return World.SpawnActor<AItemBase>(Location, FRotator::ZeroRotator); 
+		}
+	}
+	void SpawnItems(UWorld* World, TArray<AItemBase*>& out)
+	{
+		for (int i{}; const auto& loc : SpawnLocations.Get())
+		{
+			out.Add(SpawnItem(static_cast<EItemCategory>(rand() % ItemCategoryMax), *World, loc));
+		}
+	}
+};
 
 UCLASS()
 class LIGHTSOUT_API UIBSingleton : public UWorldSubsystem, public IItemBroker
@@ -21,9 +79,10 @@ public:
 
 	static UIBSingleton* Main;
 
+	FItemGenerator   ItemGenerator; 
 	InventoryMap     PlayerInventories;
-	ItemRegistry    Registry;
-	ItemSpawnPoints SpawnPoints;
+	ItemRegistry     Registry;
+	ItemSpawnPoints  SpawnPoints;
 
 	UIBSingleton(); 
 

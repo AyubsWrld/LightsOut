@@ -7,6 +7,8 @@
 #include "Net/UnrealNetwork.h"
 #include "ItemBase.generated.h"
 
+enum class EItemCategory : uint8;
+
 UCLASS()
 class LIGHTSOUT_API AItemBase : public AActor, public IInteractable
 {
@@ -14,6 +16,7 @@ class LIGHTSOUT_API AItemBase : public AActor, public IInteractable
 
 	UPROPERTY()
 	FGuid IID;
+
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -25,15 +28,35 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "Item")
 	UStaticMesh* ItemMesh;
 
+	UPROPERTY(EditAnywhere, Category=Icon)
+	UTexture2D* Icon;
+
 	AItemBase();
+	virtual ~AItemBase() = default;
+
 	virtual void Interact(FGuid Interactor) override;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
+
 	virtual void BeginPlay() override;
 
 public:
-	virtual void Tick(float DeltaTime) override;
-	[[nodiscard]] FGuid GetID() const;
+
+	virtual void Tick(float DeltaTime) override; // Needed? 
+
+ 	[[nodiscard]] virtual FGuid GetID() const;
+
+	[[nodiscard]] virtual UTexture2D* GetIcon() const ; 
+	[[nodiscard]] virtual FString GetThumbnailURI() const;
+
+	virtual void Use();
+
+	virtual void Equip();
+
+	virtual void Drop(const FVector&& Location);
+
+	virtual EItemCategory GetType() const;
+
 };

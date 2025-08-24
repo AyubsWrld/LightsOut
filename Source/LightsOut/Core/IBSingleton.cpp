@@ -7,6 +7,8 @@
 UIBSingleton* UIBSingleton::Main = nullptr;
 
 
+
+
 void DespawnItem(AActor& Item)
 {
 	Item.SetActorHiddenInGame(true);
@@ -21,7 +23,7 @@ void UIBSingleton::OnWorldBeginPlay(UWorld& InWorld)
 	MulticastSpawnItems(&InWorld);
 }
 
-[[nodiscard]] bool UIBSingleton::TryAddToPlayerInventory(AItemBase& Item, PID PlayerID)
+bool UIBSingleton::TryAddToPlayerInventory(AItemBase& Item, PID PlayerID)
 {
 	if (GetWorld()->GetNetMode() != ENetMode::NM_DedicatedServer) // sanity
 		return false; 
@@ -46,33 +48,19 @@ void UIBSingleton::DeletePlayerInventory(PID PlayerID)
 	UE_LOG(LogTemp, Warning, TEXT("Deleting from player inventory"));
 }
 
-[[nodiscard]] bool UIBSingleton::PlayerOwnsItem(AItemBase& Item, PID PlayerID) const
+bool UIBSingleton::PlayerOwnsItem(AItemBase& Item, PID PlayerID) const
 {
 	return false;
 }
 
+/* Don't need to pass in pointer */
 void UIBSingleton::MulticastSpawnItems_Implementation(UWorld* World)
 {
 	UE_LOG(LogTemp, Warning, TEXT("[%s]: Spawning Items"), ANSI_TO_TCHAR(__FUNCTION__));
 	if (!World) return;
 
 	if (World->GetNetMode() == NM_Client) return; // safety
-
-	TArray<FVector> Spawns = {
-		FVector(1330.f,  920.f, 50.f),
-		FVector(1330.f, 1130.f, 50.f),
-		FVector(1330.f,  600.f, 50.f)
-	};
-
-	TSubclassOf<AItemBase> ItemClass = AItemBase::StaticClass();
-	FActorSpawnParameters Params;
-	Params.SpawnCollisionHandlingOverride =
-		ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-	for (const FVector& Loc : Spawns)
-	{
-		AItemBase* Item = World->SpawnActor<AItemBase>(ItemClass, Loc, FRotator::ZeroRotator, Params);
-	}
+	ItemGenerator.SpawnItems(GetWorld(), Registry);
 }
 
 ItemSpawnPoints* UIBSingleton::GetItemSpawns() const

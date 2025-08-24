@@ -1,11 +1,11 @@
 #include "ItemBase.h"
 #include "LightsOut/Core/IBSingleton.h"
+#include "LightsOut/Items/ItemTypes.h"
 #include "Net/UnrealNetwork.h"
 
 // Sets default values
 AItemBase::AItemBase()
 {
-	// Assign Mesh
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(Root);
 
@@ -47,10 +47,6 @@ void AItemBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-[[nodiscard]] FGuid AItemBase::GetID() const
-{
-	return this->IID;
-}
 
 void AItemBase::Interact(FGuid Interactor)
 {
@@ -61,8 +57,44 @@ void AItemBase::Interact(FGuid Interactor)
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("[Interaction] %s Interacted with Item"), *Interactor.ToString());
 	UIBSingleton* singleton = GetWorld()->GetSubsystem<UIBSingleton>();
 	if (singleton->TryAddToPlayerInventory(*this, Interactor))
 		return; 
+}
+
+
+[[nodiscard]] FGuid AItemBase::GetID() const
+{
+	return FGuid::NewGuid();
+}
+
+[[nodiscard]] FString AItemBase::GetThumbnailURI() const
+{
+	return TEXT("STUB");
+}
+
+void AItemBase::Use()
+{
+	UE_LOG(LogTemp, Warning, TEXT("[%s]: STUB CALLED"), ANSI_TO_TCHAR(__FUNCTION__));
+}
+
+void AItemBase::Equip()
+{
+	UE_LOG(LogTemp, Warning, TEXT("[%s]: STUB CALLED"), ANSI_TO_TCHAR(__FUNCTION__));
+}
+
+void AItemBase::Drop(const FVector&& Location)
+{
+	UE_LOG(LogTemp, Warning, TEXT("[%s]: STUB CALLED"), ANSI_TO_TCHAR(__FUNCTION__));
+}
+
+
+EItemCategory AItemBase::GetType() const
+{
+	return EItemCategory::IC_Undefined; 
+}
+
+[[nodiscard]] UTexture2D* AItemBase::GetIcon() const
+{
+	return this->Icon; 
 }
