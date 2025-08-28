@@ -27,14 +27,32 @@ void ABoard::UpdateSquares()
 	if (!Minoris)
 		return;
 	UE_LOG(LogTemp, Warning, TEXT("Updating Squares"));
-	for (auto Square : Squares)
+	for (FTile& Tile: Tiles )
 	{
-		if (Square)
+		Tile.Mesh->SetMaterial(0, Minoris);
+		switch (Tile.Calamity)
 		{
-			Square->SetMaterial(0, Minoris);
+		case ECalamity::EC_Minoris:
+			UE_LOG(LogTemp, Warning, TEXT("Minoris"));
+			break;
+		case ECalamity::EC_Majoris:
+			UE_LOG(LogTemp, Warning, TEXT("Majoris"));
+			break;
+		case ECalamity::EC_Terminus:
+			UE_LOG(LogTemp, Warning, TEXT("Terminus"));
+			break;
+		default:
+			UE_LOG(LogTemp, Warning, TEXT("UNDEFINED"));
+			break;
 		}
 	}
 }
+
+void cb()
+{
+	UE_LOG(LogTemp, Warning, TEXT("TEST"));
+}
+
 
 
 /* Appending "Squares" to member variable squares */
@@ -56,25 +74,9 @@ void ABoard::PopulateSquaresFromChildren()
 				UStaticMeshComponent* MeshComp = StaticMeshActor->GetStaticMeshComponent();
 				if (MeshComp && !StaticMeshActor->ActorHasTag("Outline"))
 				{
-					Squares.Add(MeshComp);
+					Tiles.Add(FTile{*MeshComp});
 				}
 			}
 		}
 	}
-}
-
-void ABoard::GetAllStaticMeshComponents()
-{
-	Squares.Empty();
-
-	TArray<UStaticMeshComponent*> StaticMeshComponents;
-	GetComponents<UStaticMeshComponent>(StaticMeshComponents);
-
-	StaticMeshComponents.Sort([](const UStaticMeshComponent& A, const UStaticMeshComponent& B) {
-		return A.GetName() < B.GetName();
-		});
-
-	Squares = StaticMeshComponents;
-
-	UE_LOG(LogTemp, Warning, TEXT("Found %d static mesh components using GetComponents"), Squares.Num());
 }

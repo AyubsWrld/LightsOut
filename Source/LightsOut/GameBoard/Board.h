@@ -5,13 +5,35 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/ChildActorComponent.h"
 #include "Engine/StaticMeshActor.h"
+#include "LightsOut/Core/Calamities/CalamityInfo.h"
 #include "Board.generated.h"
 
-struct FPlayablableSquare
+
+struct FTile
 {
-	UStaticMeshComponent* Square{};
-	AActor* ActivePlayer{};
-	void(*Invoke)(); // Interface function pointer
+	UStaticMeshComponent* Mesh{};
+
+	const AActor* ActivePlayer{};
+
+	void(*Invoke)() {};
+
+	ECalamity Calamity{}; // Defaults to EC_Calamity::Minoris
+
+	inline void SetActivePlayer(AActor& Actor) {};
+
+
+	FTile(UStaticMeshComponent& Tile, void(*cb)()) :
+		Mesh(&Tile),
+		Invoke(cb)
+	{
+		if (Invoke)
+			Invoke();
+	}
+
+	FTile(UStaticMeshComponent& Tile) :
+		Mesh(&Tile)
+	{
+	}
 };
 
 UCLASS()
@@ -23,8 +45,7 @@ public:
 	// Sets default values for this actor's properties
 	ABoard();
 
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Board")
-	TArray<UStaticMeshComponent*> Squares;
+	TArray<FTile> Tiles;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board")
 	UMaterialInterface* Minoris;
@@ -48,15 +69,9 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Function to automatically populate the Squares array from child components
 	UFUNCTION(BlueprintCallable, Category = "Board")
 	void PopulateSquaresFromChildren();
-
-	// Function to get all static mesh components from root
-	UFUNCTION(BlueprintCallable, Category = "Board")
-	void GetAllStaticMeshComponents();
 
 };

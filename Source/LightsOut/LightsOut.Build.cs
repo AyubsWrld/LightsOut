@@ -13,7 +13,8 @@ public class LightsOut : ModuleRules
 		PublicIncludePaths.AddRange(
 			new string[] {
 				"./LightsOut/Generics",
-				"./LightsOut/Items"
+				"./LightsOut/Items",
+				"./LightsOut/Core/Calamities"
             }
 			);
 	}
