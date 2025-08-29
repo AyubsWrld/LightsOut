@@ -5,32 +5,23 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/ChildActorComponent.h"
 #include "Engine/StaticMeshActor.h"
+#include "LightsOut/Items/ItemBase.h"
 #include "LightsOut/Core/Calamities/CalamityInfo.h"
+#include "Engine/StaticMeshActor.h"
 #include "Board.generated.h"
 
 
 struct FTile
 {
-	UStaticMeshComponent* Mesh{};
+	AStaticMeshActor* Mesh{};
 
-	const AActor* ActivePlayer{};
+	AActor* ActivePlayer{};
 
-	void(*Invoke)() {};
+	FVector Center{}; 
 
-	ECalamity Calamity{}; // Defaults to EC_Calamity::Minoris
+	ECalamity Calamity{}; 
 
-	inline void SetActivePlayer(AActor& Actor) {};
-
-
-	FTile(UStaticMeshComponent& Tile, void(*cb)()) :
-		Mesh(&Tile),
-		Invoke(cb)
-	{
-		if (Invoke)
-			Invoke();
-	}
-
-	FTile(UStaticMeshComponent& Tile) :
+	FTile(AStaticMeshActor& Tile) :
 		Mesh(&Tile)
 	{
 	}
@@ -45,8 +36,6 @@ public:
 	// Sets default values for this actor's properties
 	ABoard();
 
-	TArray<FTile> Tiles;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board")
 	UMaterialInterface* Minoris;
 
@@ -59,11 +48,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board")
 	UMaterialInterface* Terminus;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board")
+	AActor* PlayerPiece;
+
 	TArray<UMaterialInterface*> Textures = { Minoris, Majoris, Finalis, Terminus }; 
 
-	UFUNCTION()
-	void UpdateSquares();
+	TArray<FTile> Tiles;
 
+	TArray<FTile> StartTiles;
+
+	UFUNCTION()
+	void SetStartingPosition(int32 PlayerCount);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

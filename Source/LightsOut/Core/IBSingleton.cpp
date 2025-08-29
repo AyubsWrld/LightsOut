@@ -5,10 +5,6 @@
 
 
 UIBSingleton* UIBSingleton::Main = nullptr;
-
-
-
-
 void DespawnItem(AActor& Item)
 {
 	Item.SetActorHiddenInGame(true);

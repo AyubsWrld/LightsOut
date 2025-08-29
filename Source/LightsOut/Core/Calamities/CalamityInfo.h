@@ -6,13 +6,14 @@
 #include "Containers/Map.h"
 #include "Materials/MaterialInterface.h"
 
+UENUM()
 enum class ECalamity
 {
-	EC_Minoris,
-	EC_Majoris,
-	EC_Finalis,
-	EC_Terminus,
-	EC_Max
+	EC_Minoris UMETA(DisplayName = "Minoris"),
+	EC_Majoris UMETA(DisplayName = "Majoris"),
+	EC_Finalis UMETA(DisplayName = "Finalis"),
+	EC_Terminus UMETA(DisplayName = "Terminus"),
+	EC_Max UMETA(DisplayName = "Max Value")
 };
 
 /* Might be an issue. perhaps const cast? */

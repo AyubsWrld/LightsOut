@@ -14,7 +14,7 @@ void ABoard::BeginPlay()
 	PopulateSquaresFromChildren();
 	bReplicates = true;
 
-	UpdateSquares();
+	SetStartingPosition(4);
 }
 
 void ABoard::Tick(float DeltaTime)
@@ -22,39 +22,7 @@ void ABoard::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ABoard::UpdateSquares()
-{
-	if (!Minoris)
-		return;
-	UE_LOG(LogTemp, Warning, TEXT("Updating Squares"));
-	for (FTile& Tile: Tiles )
-	{
-		Tile.Mesh->SetMaterial(0, Minoris);
-		switch (Tile.Calamity)
-		{
-		case ECalamity::EC_Minoris:
-			UE_LOG(LogTemp, Warning, TEXT("Minoris"));
-			break;
-		case ECalamity::EC_Majoris:
-			UE_LOG(LogTemp, Warning, TEXT("Majoris"));
-			break;
-		case ECalamity::EC_Terminus:
-			UE_LOG(LogTemp, Warning, TEXT("Terminus"));
-			break;
-		default:
-			UE_LOG(LogTemp, Warning, TEXT("UNDEFINED"));
-			break;
-		}
-	}
-}
-
-void cb()
-{
-	UE_LOG(LogTemp, Warning, TEXT("TEST"));
-}
-
-
-
+/* @refactor */
 /* Appending "Squares" to member variable squares */
 void ABoard::PopulateSquaresFromChildren()
 {
@@ -62,21 +30,40 @@ void ABoard::PopulateSquaresFromChildren()
 	TArray<USceneComponent*> ChildComponents = GetRootComponent()->GetAttachChildren();
 	TArray<USceneComponent*> SharedComponent = ChildComponents[0]->GetAttachChildren();
 
-	FName Outline{ "Outline" }; 
+	FName Outline{ TEXT("Outline") }; 
+	FName StartTile{ TEXT("StartTile") }; 
+	int x{};
 	for (USceneComponent* Component : SharedComponent)
 	{
 		if (UChildActorComponent* ChildActorComp = Cast<UChildActorComponent>(Component))
 		{
+			if (ChildActorComp->ComponentHasTag(StartTile))
+			{
+				if (AStaticMeshActor* StaticMeshActor = Cast<AStaticMeshActor>(ChildActorComp->GetChildActor()))
+				{
+					StartTiles.Add(FTile{ *StaticMeshActor });
+				}
+			}
+
 			if (ChildActorComp->ComponentHasTag(Outline))
 				return;
 			if (AStaticMeshActor* StaticMeshActor = Cast<AStaticMeshActor>(ChildActorComp->GetChildActor()))
 			{
-				UStaticMeshComponent* MeshComp = StaticMeshActor->GetStaticMeshComponent();
-				if (MeshComp && !StaticMeshActor->ActorHasTag("Outline"))
-				{
-					Tiles.Add(FTile{*MeshComp});
-				}
+				Tiles.Add(FTile{ *StaticMeshActor });
 			}
 		}
 	}
 }
+
+void ABoard::SetStartingPosition(int32 PlayerCount)
+{
+	/* @invariant */
+	if (!StartTiles.IsValidIndex(PlayerCount - 1))
+		return;
+	UWorld* World{ GetWorld() };
+	for (const FTile& Tile : StartTiles)
+	{
+		auto PlayerPieces = World->SpawnActor<AItemBase>(Tile.Mesh->GetActorLocation(), FRotator::ZeroRotator);
+	}
+}
+
