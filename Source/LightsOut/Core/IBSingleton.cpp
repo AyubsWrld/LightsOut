@@ -55,7 +55,6 @@ bool UIBSingleton::PlayerOwnsItem(AItemBase& Item, PID PlayerID) const
 /* Don't need to pass in pointer */
 void UIBSingleton::MulticastSpawnItems_Implementation(UWorld* World)
 {
-	UE_LOG(LogTemp, Warning, TEXT("[%s]: Spawning Items"), ANSI_TO_TCHAR(__FUNCTION__));
 	if (!World) return;
 
 	if (World->GetNetMode() == NM_Client) return; // safety

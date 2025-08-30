@@ -3,70 +3,77 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
-#include "Components/ChildActorComponent.h"
-#include "Engine/StaticMeshActor.h"
 #include "LightsOut/Items/ItemBase.h"
-#include "LightsOut/Core/Calamities/CalamityInfo.h"
-#include "Engine/StaticMeshActor.h"
+#include "ProceduralMeshComponent.h"
+#include "Tile.h"
 #include "Board.generated.h"
 
+#define HEIGHT 25
+#define WIDTH  25
 
-struct FTile
+const unsigned char BoardConfiguration[WIDTH][HEIGHT] =
 {
-	AStaticMeshActor* Mesh{};
-
-	AActor* ActivePlayer{};
-
-	FVector Center{}; 
-
-	ECalamity Calamity{}; 
-
-	FTile(AStaticMeshActor& Tile) :
-		Mesh(&Tile)
-	{
-	}
+    {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
+    {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
+    {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
+    {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
+    {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
+    {' ',' ',' ',' ',' ','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#',' ',' ',' ',' ',' '},
+    {' ',' ',' ',' ',' ','#',' ',' ','#',' ',' ',' ','#',' ',' ',' ','#',' ',' ','#',' ',' ',' ',' ',' '},
+    {' ',' ',' ',' ',' ','#',' ','#','#',' ',' ',' ','#',' ',' ',' ','#','#',' ','#',' ',' ',' ',' ',' '},
+    {' ',' ',' ',' ',' ','#','#','#',' ',' ',' ','#','#','#',' ',' ',' ','#','#','#',' ',' ',' ',' ',' '},
+    {' ',' ',' ',' ',' ','#',' ',' ',' ','#','#',' ',' ',' ','#','#',' ',' ',' ','#',' ',' ',' ',' ',' '},
+    {' ',' ',' ',' ',' ','#',' ',' ',' ','#',' ',' ',' ',' ',' ','#',' ',' ',' ','#',' ',' ',' ',' ',' '},
+    {' ',' ',' ',' ',' ','#',' ',' ','#',' ',' ','#','#','#',' ',' ','#',' ',' ','#',' ',' ',' ',' ',' '},
+    {'#','#','#','#','#','#','#','#','#',' ',' ','#','#','#',' ',' ','#','#','#','#','#','#','#','#','#'},
+    {' ',' ',' ',' ',' ','#',' ',' ','#',' ',' ','#','#','#',' ',' ','#',' ',' ','#',' ',' ',' ',' ',' '},
+    {' ',' ',' ',' ',' ','#',' ',' ',' ','#',' ',' ',' ',' ',' ','#',' ',' ',' ','#',' ',' ',' ',' ',' '},
+    {' ',' ',' ',' ',' ','#',' ',' ',' ','#','#',' ',' ',' ','#','#',' ',' ',' ','#',' ',' ',' ',' ',' '},
+    {' ',' ',' ',' ',' ','#','#','#',' ',' ',' ','#','#','#',' ',' ',' ','#','#','#',' ',' ',' ',' ',' '},
+    {' ',' ',' ',' ',' ','#',' ','#','#',' ',' ',' ','#',' ',' ',' ','#','#',' ','#',' ',' ',' ',' ',' '},
+    {' ',' ',' ',' ',' ','#',' ',' ','#',' ',' ',' ','#',' ',' ',' ','#',' ',' ','#',' ',' ',' ',' ',' '},
+    {' ',' ',' ',' ',' ','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#',' ',' ',' ',' ',' '},
+    {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
+    {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
+    {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
+    {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
+    {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '}
 };
 
 UCLASS()
 class LIGHTSOUT_API ABoard : public AActor
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	// Sets default values for this actor's properties
-	ABoard();
+    ABoard();
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board")
-	UMaterialInterface* Minoris;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board")
+    UMaterialInterface* Minoris;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board")
-	UMaterialInterface* Majoris;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board")
+    UMaterialInterface* Majoris;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board")
-	UMaterialInterface* Finalis;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board")
+    UMaterialInterface* Finalis;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board")
-	UMaterialInterface* Terminus;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board")
+    UMaterialInterface* Terminus;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board")
-	AActor* PlayerPiece;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board")
+    FVector SpawnLocation;
 
-	TArray<UMaterialInterface*> Textures = { Minoris, Majoris, Finalis, Terminus }; 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board")
+    UProceduralMeshComponent* Mesh;
 
-	TArray<FTile> Tiles;
+    TArray<UMaterialInterface*> Textures;
 
-	TArray<FTile> StartTiles;
-
-	UFUNCTION()
-	void SetStartingPosition(int32 PlayerCount);
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+    virtual void BeginPlay() override;
 
 public:
-	virtual void Tick(float DeltaTime) override;
+    virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable, Category = "Board")
-	void PopulateSquaresFromChildren();
-
+    UFUNCTION(NetMulticast, Reliable)
+    void SpawnGrid();
 };
