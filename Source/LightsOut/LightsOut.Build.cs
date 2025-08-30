@@ -14,7 +14,8 @@ public class LightsOut : ModuleRules
 			new string[] {
 				"./LightsOut/Generics",
 				"./LightsOut/Items",
-				"./LightsOut/Core/Calamities"
+				"./LightsOut/Core/Calamities",
+				"./LightsOut/Utility"
             }
 			);
 

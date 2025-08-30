@@ -6,6 +6,7 @@
 #include "LightsOut/Items/ItemBase.h"
 #include "ProceduralMeshComponent.h"
 #include "Tile.h"
+#include "LightsOut/Utility/ProcGen.h"
 #include "Board.generated.h"
 
 #define HEIGHT 25
