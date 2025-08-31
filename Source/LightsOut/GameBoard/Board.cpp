@@ -9,7 +9,19 @@ ABoard::ABoard()
 	Mesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("PMC"));
 	Mesh->SetupAttachment(RootComponent);
 
-	PMG::AddTriangle(*Mesh, 0, FVector{});
+	FVector Offset{};  // ( 0.0f, 0.0f, 0.0f ) 
+
+	int32 m{};
+	for (int32 i{}; i < 25; i++)
+	{
+		for (int32 j{}; j < 25; j++)
+		{
+			if( auto c{BoardConfiguration[i][j]}; c == '#')
+				PMG::AddQuad(*Mesh, m, FVector{j * 100.0f, i * 100.0f, 0.0f}); 
+			m++;
+		}
+	}
+
 }
 
 void ABoard::BeginPlay()
@@ -22,18 +34,6 @@ void ABoard::BeginPlay()
 
 	// Spawn the grid after BeginPlay when GetWorld() is available
 	SpawnGrid();
-
-    UWorld* World = GetWorld(); 
-    if (!World)
-        return;
-
-    TArray<FVector> Vertices{ 
-        FVector{0.0f, 0.0f, 0.0f},
-        FVector{0.0f, 100.0f, 0.0f},
-		FVector{100.0f, 0.0f, 0.0f} 
-    };
-
-    DrawDebugLine(World, Vertices[0], Vertices[1], FColor::Emerald, true, -1.0f, 0, 2.0f);
 }
 
 void ABoard::Tick(float DeltaTime)
