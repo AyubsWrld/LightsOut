@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "ProceduralMeshComponent.h"
 
+
 namespace PMG
 {
 
@@ -44,7 +45,7 @@ namespace PMG
 	}
 
 	/* Throws? , If so what happens when passing in an invalid mesh proc */
-	inline FProcMeshSection* AddQuad(UProceduralMeshComponent& Mesh, int32 MeshIndex, const FVector& Offset)
+	inline FProcMeshSection& AddQuad(UProceduralMeshComponent& Mesh, int32 MeshIndex, const FVector& Offset)
 	{
 		TArray<FVector>          Normals; 
 		TArray<FProcMeshTangent> Tangents; 
@@ -58,20 +59,6 @@ namespace PMG
 			{1.0f, 0.0f},
 			{0.0f, 0.0f},
 		};
-
-		/*
-			*--------------------*
-			|                    |
-			|                    |
-			|                    |
-			|                    |
-			|                    |
-			|                    |
-			|                    |
-			|                    |
-			*--------------------*
-		*/
-
 
 		TArray<FVector>          Vertices
 		{
@@ -88,6 +75,6 @@ namespace PMG
 		Colors.Init(FColor::Black, 4);
 		
 		Mesh.CreateMeshSection(MeshIndex, Vertices, Triangles, Normals, UV0, Colors, Tangents, true);
-		return Mesh.GetProcMeshSection(MeshIndex);
+		return *Mesh.GetProcMeshSection(MeshIndex);
 	}
 }

@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
+#include "ProceduralMeshComponent.h"
 #include "Tile.generated.h"
 
 UCLASS()
@@ -13,8 +14,11 @@ class LIGHTSOUT_API ATile : public AActor
 public:
 	ATile();
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mesh")
-	UStaticMeshComponent* Mesh;
+
+	UFUNCTION()
+	void Invocable(AActor* Player);
+
+	FProcMeshSection* Mesh;
 
 protected:
 	virtual void BeginPlay() override;
