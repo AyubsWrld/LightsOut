@@ -63,9 +63,9 @@ namespace PMG
 		TArray<FVector>          Vertices
 		{
 			FVector{0.0f, 0.0f, 0.0f }      + Offset, // Bottom Left
-			FVector{0.0f, 100.0f, 0.0f }    + Offset, // Bottom Right
-			FVector{100.0f, 0.0f, 0.0f }    + Offset, // Top Left
-			FVector{100.0f, 100.0f, 0.0f }  + Offset  // Top Right
+			FVector{0.0f, 10.0f, 0.0f }    + Offset, // Bottom Right
+			FVector{10.0f, 0.0f, 0.0f }    + Offset, // Top Left
+			FVector{10.0f, 10.0f, 0.0f }  + Offset  // Top Right
 		};
 
 		TArray<int32>          Triangles{2,0,1,1,3,2};
