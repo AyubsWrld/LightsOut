@@ -57,6 +57,10 @@ class LIGHTSOUT_API ABoard : public AActor
 {
     GENERATED_BODY()
 
+private:
+
+    TArray<FTile> StartTiles;
+
 public:
     ABoard();
 
@@ -82,12 +86,15 @@ public:
 
     TArray<FTile> Tiles;
 
+
     std::unordered_map<std::pair<int32, int32>, FTile> TileMap;
     void SpawnPlayers();
 
     void TestGrid();
 
     void DebugStartingPoints();
+
+    std::array<std::pair<int32, int32>, 4> GetBoardBounds();
 
 protected:
     virtual void BeginPlay() override;

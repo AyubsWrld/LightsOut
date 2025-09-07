@@ -13,6 +13,17 @@ ABoard::ABoard()
 	CreateGrid();
 }
 
+
+std::array<std::pair<int32, int32>,4> ABoard::GetBoardBounds()
+{
+	return {
+		std::pair<int32,int32>{ 0, 0 },
+		std::pair<int32,int32>{ 0, HEIGHT - 1 },
+		std::pair<int32,int32>{ WIDTH - 1 , 0 },
+		std::pair<int32,int32>{ HEIGHT - 1 , WIDTH - 1 }
+	};
+}
+
 void ABoard::BeginPlay()
 {
 	Super::BeginPlay();
@@ -82,25 +93,12 @@ void ABoard::TestGrid()
 
 void ABoard::DebugStartingPoints()
 {
-	using Coordinates = std::pair<int32, int32> ;
-
 	auto World{ GetWorld() }; 
-
-	const std::array<Coordinates, 4> SPoints{
-		Coordinates{ 0,4 },
-		Coordinates{ 4,0 },
-		Coordinates{ 0,0 },
-		Coordinates{ 4,4 }
-	};
-
 	if (!World)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Undefined World"));
 		return;
-	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Drawing debug lines"));
+		std::array<std::pair<int32, int32>, 4> SPoints{ GetBoardBounds() };
 		decltype(SPoints)::const_iterator bit{SPoints.begin()};
 		decltype(SPoints)::const_iterator eit{SPoints.end()}; 
 		for (; bit != eit; bit++)
@@ -108,6 +106,8 @@ void ABoard::DebugStartingPoints()
 			auto Coord{ *bit };
 			if (decltype(TileMap)::const_iterator Tile{ TileMap.find(Coord) }; Tile != TileMap.end())
 			{
+				/* decltype(Tile) -> TTuple<std::pair<int32,int32>, FTile> */
+				StartTiles.Emplace(Tile->second);
 				FVector Start{Tile->second.Center + RootComponent->GetComponentLocation()};
 				FVector End{ Start + FVector{0.0f, 0.0f, 100.0f} };
 				UE_LOG(LogTemp, Warning, TEXT("DBL: (%f,%f,%f)"), Start.X, Start.Y, Start.Z);
