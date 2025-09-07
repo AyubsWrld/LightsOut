@@ -7,6 +7,7 @@
 #include "LightsOut/Items/ItemBase.h"
 #include "Tile.h"
 #include "LightsOut/Utility/ProcGen.h"
+#include "LightsOut/Generics/Interactable.h"
 #include "ProceduralMeshComponent.h"
 #include "Board.generated.h"
 
@@ -53,7 +54,7 @@ struct std::hash<std::pair<int32,int32>>
 };
 
 UCLASS()
-class LIGHTSOUT_API ABoard : public AActor
+class LIGHTSOUT_API ABoard : public AActor, public IInteractable
 {
     GENERATED_BODY()
 
@@ -83,18 +84,19 @@ public:
     UProceduralMeshComponent* Mesh;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board")
-    UStaticMeshComponent* PlayerPieceModel;
+    UStaticMesh* PlayerPieceModel;
 
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board")
-    TArray<TObjectPtr<UStaticMeshComponent>> PlayerPieces;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board", Replicated)
+    TArray<UStaticMeshComponent*> PlayerPieces;
+    UFUNCTION(Reliable, NetMulticast)
+    void MulticastMovePiece(FVector Location);
 
     TArray<UMaterialInterface*> Textures;
 
     TArray<FTile> Tiles;
 
-
     std::unordered_map<std::pair<int32, int32>, FTile> TileMap;
+
     void SpawnPlayers();
 
     void TestGrid();
@@ -103,11 +105,19 @@ public:
 
     std::array<std::pair<int32, int32>, 4> GetBoardBounds();
 
+    const FVector& GetTileLocation(const std::pair<int32,int32>& Coordinates) const;
+
+	virtual void Interact(FGuid Interactor) override ; 
+
 protected:
     virtual void BeginPlay() override;
 
 public:
+
+
     virtual void Tick(float DeltaTime) override;
+
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
     void CreateGrid();
 };
