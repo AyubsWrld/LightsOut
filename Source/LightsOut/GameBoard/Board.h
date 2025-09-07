@@ -82,6 +82,13 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board")
     UProceduralMeshComponent* Mesh;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board")
+    UStaticMeshComponent* PlayerPieceModel;
+
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board")
+    TArray<TObjectPtr<UStaticMeshComponent>> PlayerPieces;
+
     TArray<UMaterialInterface*> Textures;
 
     TArray<FTile> Tiles;

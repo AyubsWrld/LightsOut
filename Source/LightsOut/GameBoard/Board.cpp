@@ -10,6 +10,8 @@ ABoard::ABoard()
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	Mesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("PMC"));
 	Mesh->SetupAttachment(RootComponent);
+	PlayerPieceModel = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Player Piece"));
+	PlayerPieceModel->SetupAttachment(RootComponent);
 	CreateGrid();
 }
 
@@ -30,11 +32,8 @@ void ABoard::BeginPlay()
 	bReplicates = true;
 	// Populate Textures array with assigned materials
 	Textures = { Minoris, Majoris, Finalis, Terminus };
-	SpawnPlayers();
-
-	const FVector& Location = RootComponent->GetComponentLocation();
-	UWorld* World = GetWorld();
 	DebugStartingPoints();
+	SpawnPlayers();
 }
 
 void ABoard::Tick(float DeltaTime)
@@ -75,11 +74,22 @@ void ABoard::CreateGrid()
 /* Tile Locations not set relatively ? */
 void ABoard::SpawnPlayers()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Spawn Players called"));
+	UE_LOG(LogTemp, Warning, TEXT("Start tiles amount %d"), StartTiles.Num());
 	UWorld* World{ GetWorld() };
-	if (!World || Tiles.IsEmpty())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed: !World || Tiles.IsEmpty()"));
+	if (!World || StartTiles.IsEmpty())
 		return;
+	else
+	{
+		for (const auto& Tile : StartTiles)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Placing character"));
+			UStaticMeshComponent* PMesh{ PlayerPieceModel };
+			PMesh->SetupAttachment(RootComponent);
+			FVector StartPos { Tile.Center + RootComponent->GetComponentLocation()};
+			PMesh->SetWorldLocation(StartPos);
+			PlayerPieces.Emplace(PMesh);
+		}
 	}
 }
 
@@ -110,7 +120,6 @@ void ABoard::DebugStartingPoints()
 				StartTiles.Emplace(Tile->second);
 				FVector Start{Tile->second.Center + RootComponent->GetComponentLocation()};
 				FVector End{ Start + FVector{0.0f, 0.0f, 100.0f} };
-				UE_LOG(LogTemp, Warning, TEXT("DBL: (%f,%f,%f)"), Start.X, Start.Y, Start.Z);
 				DrawDebugLine(World, Start, End, FColor::Red, true, -1.0f, 0, 2.0f);
 			}
 		}
