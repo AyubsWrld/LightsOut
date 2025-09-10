@@ -2,13 +2,18 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "array"
 #include "Components/StaticMeshComponent.h"
 #include "LightsOut/Items/ItemBase.h"
+#include "array"
 #include "Tile.h"
 #include "LightsOut/Utility/ProcGen.h"
 #include "LightsOut/Generics/Interactable.h"
+#include "LightsOut/Core/BoardManager.h"
 #include "ProceduralMeshComponent.h"
+#include "Engine/World.h"
+#include "UObject/ConstructorHelpers.h"
+#include "Engine/StaticMeshActor.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "Board.generated.h"
 
 #define HEIGHT 5
@@ -107,7 +112,7 @@ public:
 
     const FVector& GetTileLocation(const std::pair<int32,int32>& Coordinates) const;
 
-	virtual void Interact(FGuid Interactor) override ; 
+	virtual void Interact(APlayerState* Player) override ; 
 
 protected:
     virtual void BeginPlay() override;

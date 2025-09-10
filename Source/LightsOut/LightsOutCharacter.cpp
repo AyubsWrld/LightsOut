@@ -136,7 +136,7 @@ void ALightsOutCharacter::ServerHandleInteractionRequest_Implementation()
 	{
 		/* This is atomic and should be wrapped into a single call */
 		IInteractable* Interactable = Cast<IInteractable>(HitActor);
-		Interactable->Interact(GetActorGuid()); // Perhaps we can deduce actor guid elsewhere? or maybe global delegate the interaction. 
+		Interactable->Interact(GetPlayerState()); // Perhaps we can deduce actor guid elsewhere? or maybe global delegate the interaction. 
 		//ClientUpdateHUD(Cast<AItemBase>(Interactable));
 	}
 }

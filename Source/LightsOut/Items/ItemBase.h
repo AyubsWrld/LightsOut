@@ -34,7 +34,7 @@ public:
 	AItemBase();
 	virtual ~AItemBase() = default;
 
-	virtual void Interact(FGuid Interactor) override;
+	virtual void Interact(APlayerState* Player) override;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

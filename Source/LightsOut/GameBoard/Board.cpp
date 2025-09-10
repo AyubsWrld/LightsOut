@@ -1,9 +1,4 @@
 ﻿#include "Board.h"
-#include "Engine/World.h"
-#include "UObject/ConstructorHelpers.h"
-#include "Engine/StaticMeshActor.h"
-#include "Components/StaticMeshComponent.h"
-#include "Materials/MaterialInstanceDynamic.h"
 
 void ABoard::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -90,7 +85,6 @@ void ABoard::SpawnPlayers()
 		for (int32 i = 0; i < StartTiles.Num(); i++)
 		{
 			const auto& Tile = StartTiles[i];
-			UE_LOG(LogTemp, Warning, TEXT("Placing character %d"), i);
 
 			// Create a NEW static mesh component for each player at runtime
 			UStaticMeshComponent* PMesh = NewObject<UStaticMeshComponent>(this, *FString::Printf(TEXT("PlayerPiece_%d"), i));
@@ -232,9 +226,7 @@ void ABoard::MulticastMovePiece_Implementation(FVector Location)
 		}
 	}
 }
-
-
-void ABoard::Interact(FGuid Interactor)
+void ABoard::Interact(APlayerState* Player)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Interact called"));
 
@@ -250,7 +242,6 @@ void ABoard::Interact(FGuid Interactor)
 	const FVector& Location = GetTileLocation(TargetCoords);
 	UE_LOG(LogTemp, Warning, TEXT("GetTileLocation returned: (%f,%f,%f)"), Location.X, Location.Y, Location.Z);
 
-	// Check if the tile actually exists in the map
 	if (auto it = TileMap.find(TargetCoords); it != TileMap.end())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Tile found in map at (%d,%d)"), TargetCoords.first, TargetCoords.second);
@@ -261,6 +252,8 @@ void ABoard::Interact(FGuid Interactor)
 		UE_LOG(LogTemp, Error, TEXT("Tile NOT found in map at (%d,%d)"), TargetCoords.first, TargetCoords.second);
 	}
 
+	UBoardManager* BoardManager = GetWorld()->GetSubsystem<UBoardManager>();
+	BoardManager->ServerHandleRequest(Player);
 	MulticastMovePiece(Location);
 }
 

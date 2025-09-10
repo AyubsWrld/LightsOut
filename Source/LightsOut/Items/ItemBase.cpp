@@ -48,7 +48,7 @@ void AItemBase::Tick(float DeltaTime)
 }
 
 
-void AItemBase::Interact(FGuid Interactor)
+void AItemBase::Interact(APlayerState* Player)
 {
 	/* Should be executing within the context of the server */
 	if (GetNetMode() == ENetMode::NM_Client)
@@ -58,8 +58,11 @@ void AItemBase::Interact(FGuid Interactor)
 	}
 
 	UIBSingleton* ItemBroker = GetWorld()->GetSubsystem<UIBSingleton>();
-	if (ItemBroker->TryAddToPlayerInventory(*this, Interactor))
+
+	/*
+	if (ItemBroker->TryAddToPlayerInventory(*this, Player->))
 		return; 
+	*/
 }
 
 
