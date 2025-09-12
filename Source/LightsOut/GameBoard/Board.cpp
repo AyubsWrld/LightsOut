@@ -75,8 +75,8 @@ void ABoard::CreateGrid()
 
 void ABoard::SpawnPlayers()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Spawn Players called"));
-	UE_LOG(LogTemp, Warning, TEXT("Start tiles amount %d"), StartTiles.Num());
+	//UE_LOG(LogTemp, Warning, TEXT("Spawn Players called"));
+	//UE_LOG(LogTemp, Warning, TEXT("Start tiles amount %d"), StartTiles.Num());
 	UWorld* World{ GetWorld() };
 	if (!World || StartTiles.IsEmpty())
 		return;
@@ -164,24 +164,24 @@ const FVector& ABoard::GetTileLocation(const std::pair<int32, int32>& Coordinate
 
 void ABoard::MulticastMovePiece_Implementation(FVector Location)
 {
-	UE_LOG(LogTemp, Warning, TEXT("MovePiece: local tile=(%f,%f,%f)"), Location.X, Location.Y, Location.Z);
+	//UE_LOG(LogTemp, Warning, TEXT("MovePiece: local tile=(%f,%f,%f)"), Location.X, Location.Y, Location.Z);
 
 	// 1) Input sanity
 	if (Location.IsZero())
 	{
-		UE_LOG(LogTemp, Error, TEXT("Location is zero (GetTileLocation failed)."));
+		//UE_LOG(LogTemp, Error, TEXT("Location is zero (GetTileLocation failed)."));
 		return;
 	}
 	if (!PlayerPieces.IsValidIndex(0))
 	{
-		UE_LOG(LogTemp, Error, TEXT("PlayerPieces[0] invalid."));
+		//UE_LOG(LogTemp, Error, TEXT("PlayerPieces[0] invalid."));
 		return;
 	}
 
 	UStaticMeshComponent* P = PlayerPieces[0];
 	if (!P)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Player piece doesn't exist"));
+		//UE_LOG(LogTemp, Warning, TEXT("Player piece doesn't exist"));
 		return;
 	}
 
@@ -199,8 +199,7 @@ void ABoard::MulticastMovePiece_Implementation(FVector Location)
 
 	// 4) Move it
 	const FVector CurrentPos = P->GetComponentLocation();
-	UE_LOG(LogTemp, Warning, TEXT("Current=(%f,%f,%f)  Target(world)=(%f,%f,%f)"),
-		CurrentPos.X, CurrentPos.Y, CurrentPos.Z, WorldTarget.X, WorldTarget.Y, WorldTarget.Z);
+	//UE_LOG(LogTemp, Warning, TEXT("Current=(%f,%f,%f)  Target(world)=(%f,%f,%f)"),CurrentPos.X, CurrentPos.Y, CurrentPos.Z, WorldTarget.X, WorldTarget.Y, WorldTarget.Z);
 
 	P->SetWorldLocation(WorldTarget, /*bSweep=*/true);
 
@@ -228,28 +227,28 @@ void ABoard::MulticastMovePiece_Implementation(FVector Location)
 }
 void ABoard::Interact(APlayerState* Player)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Interact called"));
+	//UE_LOG(LogTemp, Warning, TEXT("Interact called"));
 
 	if (PlayerPieces.IsEmpty())
 	{
-		UE_LOG(LogTemp, Error, TEXT("PlayerPieces is empty!"));
+		//UE_LOG(LogTemp, Error, TEXT("PlayerPieces is empty!"));
 		return;
 	}
 
 	std::pair<int32, int32> TargetCoords{ 3,3 };
-	UE_LOG(LogTemp, Warning, TEXT("Trying to get location for coordinates (%d,%d)"), TargetCoords.first, TargetCoords.second);
+	//UE_LOG(LogTemp, Warning, TEXT("Trying to get location for coordinates (%d,%d)"), TargetCoords.first, TargetCoords.second);
 
 	const FVector& Location = GetTileLocation(TargetCoords);
-	UE_LOG(LogTemp, Warning, TEXT("GetTileLocation returned: (%f,%f,%f)"), Location.X, Location.Y, Location.Z);
+	//UE_LOG(LogTemp, Warning, TEXT("GetTileLocation returned: (%f,%f,%f)"), Location.X, Location.Y, Location.Z);
 
 	if (auto it = TileMap.find(TargetCoords); it != TileMap.end())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Tile found in map at (%d,%d)"), TargetCoords.first, TargetCoords.second);
-		UE_LOG(LogTemp, Warning, TEXT("Tile center: (%f,%f,%f)"), it->second.Center.X, it->second.Center.Y, it->second.Center.Z);
+		//UE_LOG(LogTemp, Warning, TEXT("Tile found in map at (%d,%d)"), TargetCoords.first, TargetCoords.second);
+		//UE_LOG(LogTemp, Warning, TEXT("Tile center: (%f,%f,%f)"), it->second.Center.X, it->second.Center.Y, it->second.Center.Z);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("Tile NOT found in map at (%d,%d)"), TargetCoords.first, TargetCoords.second);
+		//UE_LOG(LogTemp, Error, TEXT("Tile NOT found in map at (%d,%d)"), TargetCoords.first, TargetCoords.second);
 	}
 
 	UBoardManager* BoardManager = GetWorld()->GetSubsystem<UBoardManager>();

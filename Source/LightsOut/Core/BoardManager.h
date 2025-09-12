@@ -25,10 +25,9 @@ class LIGHTSOUT_API UBoardManager : public UWorldSubsystem
 	UFUNCTION(Reliable, NetMulticast)
 	void MulticastGreetPlayers() const; 
 
-	TArray<APlayerState*> PlayerStates;
+	int32 CurrentPlayerIndex{};
 
-	APlayerController& ActivePlayer() const;
-
+	TArray<TObjectPtr<APlayerController>> PlayerStates;
 	/* ------------------------------------ Setup Functions ----------------------------------- */
 	
 	void BindPlayerControllers();
@@ -36,7 +35,12 @@ class LIGHTSOUT_API UBoardManager : public UWorldSubsystem
 public:
 
 	UFUNCTION(Reliable, Server)
-	void ServerHandleRequest(const APlayerState* Player) const; 
+	[[nodiscard]] void ServerHandleRequest(APlayerState* Player) ; 
 
+	TObjectPtr<APlayerController> GetActivePlayer() const; 
+
+	void SetActivePlayer(int32 Index) ; 
+
+	inline void UpdateCurrentPlayerIndex();
 
 };

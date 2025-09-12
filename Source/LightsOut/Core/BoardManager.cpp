@@ -22,26 +22,38 @@ void UBoardManager::Initialize(FSubsystemCollectionBase& Collection)
 {
 	if (GetWorld()->GetNetMode() != ENetMode::NM_DedicatedServer)
 		return;
+
 	TDelegate<void(AActor*), FDefaultDelegateUserPolicy> Delegate;
 
 	FOnActorSpawned::FDelegate ActorSpawnedDelegate{ 
 		FOnActorSpawned::FDelegate::CreateLambda( [&](AActor* P){
-				if (APlayerController* PC{Cast<APlayerController>(P)}; PC)
-					PlayerStates.Add(PC->GetPlayerState<APlayerState>());
+				if (APlayerController* PC{ Cast<APlayerController>(P) }; PC)
+					PlayerStates.Add(PC);
 			}) 
 	};
 	FDelegateHandle DispatchFunction{ GetWorld()->AddOnActorSpawnedHandler(ActorSpawnedDelegate) };
 }
 
-void UBoardManager::ServerHandleRequest_Implementation(const APlayerState* Player) const
+void UBoardManager::ServerHandleRequest_Implementation(APlayerState* Player) 
 {
 	if (!Player)
 		return;
 
-	//FUniqueNetIdRepl NetId{ Player->BP_GetUniqueId() };
-	//UE_LOG(LogTemp, Warning, TEXT("PlayerID: %d"), Player->GetPlayerID());
-
-	MulticastGreetPlayers();
+	TObjectPtr<APlayerController> ActivePlayer{ GetActivePlayer() };
+	APlayerState* PSP{ActivePlayer.Get()->PlayerState}; 
+	if (PSP && Player)
+	{
+		if (PSP->GetPlayerId() == Player->GetPlayerId())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("It is the players turn"));
+			UpdateCurrentPlayerIndex();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Wrong Players Turn"));
+		}
+	}
+	//MulticastGreetPlayers();
 }
 
 void UBoardManager::MulticastGreetPlayers_Implementation() const
@@ -56,6 +68,26 @@ void UBoardManager::BindPlayerControllers()
 	{
 	}
 }
+
+TObjectPtr<APlayerController> UBoardManager::GetActivePlayer() const
+{
+	if (!PlayerStates.IsValidIndex(CurrentPlayerIndex))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Returning null"));
+		return {};
+	}
+	return  PlayerStates[CurrentPlayerIndex] ;
+}
+
+void UBoardManager::SetActivePlayer(int32 Index) 
+{
+};
+
+inline void UBoardManager::UpdateCurrentPlayerIndex() 
+{
+	CurrentPlayerIndex = ++CurrentPlayerIndex % PlayerStates.Num();
+	UE_LOG(LogTemp, Warning, TEXT("Current Players Turn: %d"), CurrentPlayerIndex);
+};
 
 
 
