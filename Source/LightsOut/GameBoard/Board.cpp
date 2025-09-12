@@ -44,6 +44,7 @@ void ABoard::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+
 void ABoard::CreateGrid()
 {
 	int32 m{};
@@ -164,26 +165,14 @@ const FVector& ABoard::GetTileLocation(const std::pair<int32, int32>& Coordinate
 
 void ABoard::MulticastMovePiece_Implementation(FVector Location)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("MovePiece: local tile=(%f,%f,%f)"), Location.X, Location.Y, Location.Z);
 
 	// 1) Input sanity
-	if (Location.IsZero())
-	{
-		//UE_LOG(LogTemp, Error, TEXT("Location is zero (GetTileLocation failed)."));
-		return;
-	}
-	if (!PlayerPieces.IsValidIndex(0))
-	{
-		//UE_LOG(LogTemp, Error, TEXT("PlayerPieces[0] invalid."));
-		return;
-	}
+	if (Location.IsZero()) return;
+	if (!PlayerPieces.IsValidIndex(0)) return;
 
 	UStaticMeshComponent* P = PlayerPieces[0];
-	if (!P)
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("Player piece doesn't exist"));
-		return;
-	}
+
+	if (!P) return;
 
 	// 2) Convert tile-local -> world (board root space -> world)
 	const FTransform RootXf = RootComponent ? RootComponent->GetComponentTransform() : GetActorTransform();
@@ -227,29 +216,11 @@ void ABoard::MulticastMovePiece_Implementation(FVector Location)
 }
 void ABoard::Interact(APlayerState* Player)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Interact called"));
-
 	if (PlayerPieces.IsEmpty())
-	{
-		//UE_LOG(LogTemp, Error, TEXT("PlayerPieces is empty!"));
 		return;
-	}
 
 	std::pair<int32, int32> TargetCoords{ 3,3 };
-	//UE_LOG(LogTemp, Warning, TEXT("Trying to get location for coordinates (%d,%d)"), TargetCoords.first, TargetCoords.second);
-
 	const FVector& Location = GetTileLocation(TargetCoords);
-	//UE_LOG(LogTemp, Warning, TEXT("GetTileLocation returned: (%f,%f,%f)"), Location.X, Location.Y, Location.Z);
-
-	if (auto it = TileMap.find(TargetCoords); it != TileMap.end())
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("Tile found in map at (%d,%d)"), TargetCoords.first, TargetCoords.second);
-		//UE_LOG(LogTemp, Warning, TEXT("Tile center: (%f,%f,%f)"), it->second.Center.X, it->second.Center.Y, it->second.Center.Z);
-	}
-	else
-	{
-		//UE_LOG(LogTemp, Error, TEXT("Tile NOT found in map at (%d,%d)"), TargetCoords.first, TargetCoords.second);
-	}
 
 	UBoardManager* BoardManager = GetWorld()->GetSubsystem<UBoardManager>();
 	BoardManager->ServerHandleRequest(Player);
