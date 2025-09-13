@@ -4,20 +4,31 @@ void ABoard::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimePr
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	// Replicate the PlayerPieces array so all clients see the same player pieces
+	// replicate the PlayerPieces array so all clients see the same player pieces
 	DOREPLIFETIME(ABoard, PlayerPieces);
-	// DOREPLIFETIME(ABoard, Textures);
 }
 
 ABoard::ABoard()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
-	Mesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("PMC"));
-	Mesh->SetupAttachment(RootComponent);
-	CreateGrid();
+
+	// replication
 	SetReplicates(true);
 	SetReplicateMovement(true);
+
+	// Load the plane mesh asset
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> PlaneMeshAsset(TEXT("/Engine/BasicShapes/Plane.Plane"));
+	if (PlaneMeshAsset.Succeeded())
+	{
+		TileMeshAsset = PlaneMeshAsset.Object;
+	}
+
+	// visibility
+	CreateGrid();
 }
+
 std::array<std::pair<int32, int32>, 4> ABoard::GetBoardBounds()
 {
 	return {
@@ -35,6 +46,13 @@ void ABoard::BeginPlay()
 
 	// Populate Textures array with assigned materials
 	Textures = { Minoris, Majoris, Finalis, Terminus };
+
+	// Only create grid if it wasn't created in constructor
+	if (TileMeshes.Num() == 0)
+	{
+		CreateGrid();
+	}
+
 	DebugStartingPoints();
 	SpawnPlayers();
 }
@@ -44,40 +62,86 @@ void ABoard::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-
 void ABoard::CreateGrid()
 {
-	int32 m{};
-	for (int32 i{}; i < HEIGHT; i++)
+	// Clear existing tiles first
+	TileMeshes.Empty();
+	Tiles.Empty();
+	TileMap.clear();
+
+	int32 TileIndex = 0;
+	for (int32 i = 0; i < HEIGHT; i++)
 	{
-		for (int32 j{}; j < WIDTH; j++)
+		for (int32 j = 0; j < WIDTH; j++)
 		{
-			if (auto c{ BoardConfiguration[i][j] }; c == '#')
+			if (auto c = BoardConfiguration[i][j]; c == '#')
 			{
 				// (x,y) Coordinates on the Gameboard. 
-				std::pair<int32, int32> CCoords{ i,j };
+				std::pair<int32, int32> CCoords{ i, j };
 
-				// Creates mesh section and returns reference to the newly created mesh section. 
-				FProcMeshSection MSection{ PMG::AddQuad(*Mesh, m, FVector{j * 10.0f, i * 10.0f, 0.0f}) };
+				// Create individual static mesh component for this tile
+				FString TileName = FString::Printf(TEXT("Tile_%d_%d"), i, j);
+				UStaticMeshComponent* TileMesh = CreateDefaultSubobject<UStaticMeshComponent>(*TileName);
 
-				// Use MeshSection to inititalize FTile. Explicit Temp Object.
-				FTile Tile{ MSection, nullptr, CCoords };
+				if (!TileMesh)
+				{
+					UE_LOG(LogTemp, Error, TEXT("Failed to create tile mesh component for tile %d,%d"), i, j);
+					continue;
+				}
 
-				// FTile::Center set within the constructor for FTile. 
+				TileMesh->SetupAttachment(RootComponent);
+
+				if (TileMeshAsset)
+				{
+					TileMesh->SetStaticMesh(TileMeshAsset);
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("TileMeshAsset is null for tile %d,%d"), i, j);
+				}
+
+				FVector TileLocation{ j * 100.0f, i * 100.0f, 0.0f }; 
+				TileMesh->SetRelativeLocation(TileLocation);
+				TileMesh->SetRelativeScale3D(FVector{ 1.0f, 1.0f, 1.0f }); 
+
+				// set up replication only if we're in a networked context
+				if (GetWorld() && GetWorld()->GetNetMode() != NM_Standalone)
+				{
+					TileMesh->SetIsReplicated(true);
+					TileMesh->SetNetAddressable();
+				}
+
+				// set default material
+				if (DefaultTileMaterial)
+				{
+					TileMesh->SetMaterial(0, DefaultTileMaterial);
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("DefaultTileMaterial is null for tile %d,%d"), i, j);
+				}
+
+				// store reference to mesh
+				TileMeshes.Add(TileMesh);
+
+				// create FTile with reference to the mesh component
+				FTile Tile{ TileMesh, CCoords };
+				Tile.Center = TileLocation; // Set center manually.. make const later and calculate in constructor.
+
+				// add to collections
 				Tiles.Add(Tile);
+				TileMap.emplace(CCoords, Tile);
 
-				// Add the tile to the TileMap setting the Coordinates to (i,j) 
-				TileMap.emplace(std::pair<int32, int32>{i, j}, Tile);
+				TileIndex++;
 			}
-			m++;
 		}
 	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Created %d tiles"), TileIndex);
 }
 
 void ABoard::SpawnPlayers()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Spawn Players called"));
-	//UE_LOG(LogTemp, Warning, TEXT("Start tiles amount %d"), StartTiles.Num());
 	UWorld* World{ GetWorld() };
 	if (!World || StartTiles.IsEmpty())
 		return;
@@ -104,11 +168,10 @@ void ABoard::SpawnPlayers()
 
 			FVector StartPos{ Tile.Center + RootComponent->GetComponentLocation() };
 			PMesh->SetWorldLocation(FVector{ StartPos + FVector{0.0f, 0.0f, 5.0f} });
-			PMesh->SetWorldScale3D(FVector{ 0.035f, 0.035f, 0.035f });
+			PMesh->SetWorldScale3D(FVector{ 0.25f, 0.25f, 0.25f });
 
 			// Register the component so it gets properly updated
 			PMesh->RegisterComponent();
-
 
 			PlayerPieces.Emplace(PMesh);
 		}
@@ -163,9 +226,61 @@ const FVector& ABoard::GetTileLocation(const std::pair<int32, int32>& Coordinate
 	}
 }
 
+void ABoard::SetTileColor(const std::pair<int32, int32>& Coordinates, FLinearColor NewColor)
+{
+	auto TileIt = TileMap.find(Coordinates);
+	if (TileIt == TileMap.end()) return;
+
+	// Get the tile's mesh component
+	UStaticMeshComponent* TileMesh = TileIt->second.MeshComponent;
+	if (!TileMesh) return;
+
+	// Create or get material instance dynamic
+	UMaterialInterface* BaseMaterial = TileMesh->GetMaterial(0);
+	if (!BaseMaterial && DefaultTileMaterial)
+	{
+		BaseMaterial = DefaultTileMaterial;
+	}
+
+	if (BaseMaterial)
+	{
+		UMaterialInstanceDynamic* DynMaterial = UMaterialInstanceDynamic::Create(BaseMaterial, this);
+		if (DynMaterial)
+		{
+			// Try different common parameter names for color
+			DynMaterial->SetVectorParameterValue(FName("BaseColor"), NewColor);
+			DynMaterial->SetVectorParameterValue(FName("Color"), NewColor);
+			DynMaterial->SetVectorParameterValue(FName("Albedo"), NewColor);
+			DynMaterial->SetVectorParameterValue(FName("Diffuse"), NewColor);
+
+			TileMesh->SetMaterial(0, DynMaterial);
+		}
+	}
+}
+
+void ABoard::SetTileMaterial(const std::pair<int32, int32>& Coordinates, UMaterialInterface* NewMaterial)
+{
+	auto TileIt = TileMap.find(Coordinates);
+	if (TileIt == TileMap.end()) return;
+
+	UStaticMeshComponent* TileMesh = TileIt->second.MeshComponent;
+	if (!TileMesh || !NewMaterial) return;
+
+	TileMesh->SetMaterial(0, NewMaterial);
+}
+
+UStaticMeshComponent* ABoard::GetTileMesh(const std::pair<int32, int32>& Coordinates) const
+{
+	auto TileIt = TileMap.find(Coordinates);
+	if (TileIt != TileMap.end())
+	{
+		return TileIt->second.MeshComponent;
+	}
+	return nullptr;
+}
+
 void ABoard::MulticastMovePiece_Implementation(FVector Location)
 {
-
 	// 1) Input sanity
 	if (Location.IsZero()) return;
 	if (!PlayerPieces.IsValidIndex(0)) return;
@@ -214,6 +329,7 @@ void ABoard::MulticastMovePiece_Implementation(FVector Location)
 		}
 	}
 }
+
 void ABoard::Interact(APlayerState* Player)
 {
 	if (PlayerPieces.IsEmpty())
@@ -221,6 +337,9 @@ void ABoard::Interact(APlayerState* Player)
 
 	std::pair<int32, int32> TargetCoords{ 3,3 };
 	const FVector& Location = GetTileLocation(TargetCoords);
+
+	// Example: Change tile color when interacting
+	SetTileColor(TargetCoords, FLinearColor::Green);
 
 	UBoardManager* BoardManager = GetWorld()->GetSubsystem<UBoardManager>();
 	BoardManager->ServerHandleRequest(Player);

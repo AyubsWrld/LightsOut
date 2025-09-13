@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "utility"
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
 #include "LightsOut/Items/ItemBase.h"
@@ -20,27 +21,7 @@
 #define WIDTH  5
 
 
-/* Check size ( guessing decreasing size order right now )*/
-struct FTile
-{
-    FProcMeshSection& MeshSection; 
-    const FVector Center; 
-    std::pair<int, int> Coordinates;
-    void(*Invocable )(AActor* Actor); 
-
-    FTile(FProcMeshSection& meshSection, void(*temp)(AActor* Actor), std::pair<short,short> coords)
-        :   MeshSection(meshSection),
-            Center(MeshSection.SectionLocalBox.GetCenter()),
-            Coordinates(coords),
-            Invocable(temp)
-    {
-
-    }
-
-    FTile() = delete;
-};
-
-const unsigned char BoardConfiguration[WIDTH][HEIGHT] =
+const unsigned char BoardConfiguration[HEIGHT][WIDTH] =
 {
     {'#','#','#','#','#'},
     {'#','#','#','#','#'},
@@ -48,6 +29,21 @@ const unsigned char BoardConfiguration[WIDTH][HEIGHT] =
     {'#','#','#','#','#'},
     {'#','#','#','#','#'}
 };
+
+/* Check size ( guessing decreasing size order right now )*/
+struct FTile
+{
+    UStaticMeshComponent* MeshComponent{};
+    FVector Center{};
+    std::pair<int, int> Coordinates{};
+
+    FTile(UStaticMeshComponent* TileMesh , std::pair<int,int> coords)
+		:   MeshComponent(TileMesh),
+            Coordinates(coords)
+    {}
+    FTile() = delete;
+};
+
 
 template<>
 struct std::hash<std::pair<int32,int32>>
@@ -57,6 +53,7 @@ struct std::hash<std::pair<int32,int32>>
         return value.first ^ value.second << 10;
     }
 };
+
 
 UCLASS()
 class LIGHTSOUT_API ABoard : public AActor, public IInteractable
@@ -95,6 +92,21 @@ public:
     TArray<UStaticMeshComponent*> PlayerPieces;
     UFUNCTION(Reliable, NetMulticast)
     void MulticastMovePiece(FVector Location);
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Board")
+    UStaticMesh* TileMeshAsset; 
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Board")
+    UMaterialInterface* DefaultTileMaterial; 
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Board")
+    TArray<UStaticMeshComponent*> TileMeshes;
+
+    void SetTileColor(const std::pair<int32, int32>& Coordinates, FLinearColor NewColor);
+
+    void SetTileMaterial(const std::pair<int32, int32>& Coordinates, UMaterialInterface* NewMaterial);
+
+    UStaticMeshComponent* GetTileMesh(const std::pair<int32, int32>& Coordinates) const;
 
     TArray<UMaterialInterface*> Textures;
 
