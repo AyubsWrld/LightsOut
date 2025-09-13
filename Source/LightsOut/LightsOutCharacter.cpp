@@ -82,7 +82,6 @@ void ALightsOutCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		EnhancedInputComponent->BindAction(EquipSlotOneAction, ETriggerEvent::Triggered, this, &ALightsOutCharacter::EquipSlot1);
 		EnhancedInputComponent->BindAction(EquipSlotTwoAction, ETriggerEvent::Triggered, this, &ALightsOutCharacter::EquipSlot2);
 		EnhancedInputComponent->BindAction(EquipSlotThreeAction, ETriggerEvent::Triggered, this, &ALightsOutCharacter::EquipSlot3);
-
 	}
 	else
 	{

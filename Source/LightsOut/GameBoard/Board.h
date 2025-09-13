@@ -4,6 +4,7 @@
 #include "utility"
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/BoxComponent.h"
 #include "LightsOut/Items/ItemBase.h"
 #include "array"
 #include "Tile.h"
@@ -93,6 +94,11 @@ public:
     UFUNCTION(Reliable, NetMulticast)
     void MulticastMovePiece(FVector Location);
 
+    UFUNCTION()
+    void HandleOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+        UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+        bool bFromSweep, const FHitResult& SweepResult);
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Board")
     UStaticMesh* TileMeshAsset; 
 
@@ -101,6 +107,9 @@ public:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Board")
     TArray<UStaticMeshComponent*> TileMeshes;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
+    UBoxComponent* BoxCollider;
 
     void SetTileColor(const std::pair<int32, int32>& Coordinates, FLinearColor NewColor);
 
@@ -124,6 +133,7 @@ public:
 
     const FVector& GetTileLocation(const std::pair<int32,int32>& Coordinates) const;
 
+    void Highlight(); 
 	virtual void Interact(APlayerState* Player) override ; 
 
 protected:

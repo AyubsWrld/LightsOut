@@ -10,15 +10,19 @@ void ABoard::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimePr
 
 ABoard::ABoard()
 {
+
 	PrimaryActorTick.bCanEverTick = true;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+	BoxCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("Collision Box"));
 
-	// replication
+	BoxCollider->SetupAttachment(RootComponent);
+	BoxCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	BoxCollider->OnComponentBeginOverlap.AddDynamic(this,&ABoard::HandleOverlap);
+
 	SetReplicates(true);
 	SetReplicateMovement(true);
 
-	// Load the plane mesh asset
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> PlaneMeshAsset(TEXT("/Engine/BasicShapes/Plane.Plane"));
 	if (PlaneMeshAsset.Succeeded())
 	{
@@ -57,9 +61,19 @@ void ABoard::BeginPlay()
 	SpawnPlayers();
 }
 
+void ABoard::HandleOverlap(
+	UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+	bool bFromSweep, const FHitResult& SweepResult
+)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Overlapping occured"));
+}
+
 void ABoard::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 }
 
 void ABoard::CreateGrid()
@@ -74,66 +88,60 @@ void ABoard::CreateGrid()
 	{
 		for (int32 j = 0; j < WIDTH; j++)
 		{
-			if (auto c = BoardConfiguration[i][j]; c == '#')
+			// (x,y) Coordinates on the Gameboard. 
+			std::pair<int32, int32> CCoords{ i, j };
+
+			// Create individual static mesh component for this tile
+			FString TileName = FString::Printf(TEXT("Tile_%d_%d"), i, j);
+			UStaticMeshComponent* TileMesh = CreateDefaultSubobject<UStaticMeshComponent>(*TileName);
+
+			if (!TileMesh)
 			{
-				// (x,y) Coordinates on the Gameboard. 
-				std::pair<int32, int32> CCoords{ i, j };
-
-				// Create individual static mesh component for this tile
-				FString TileName = FString::Printf(TEXT("Tile_%d_%d"), i, j);
-				UStaticMeshComponent* TileMesh = CreateDefaultSubobject<UStaticMeshComponent>(*TileName);
-
-				if (!TileMesh)
-				{
-					UE_LOG(LogTemp, Error, TEXT("Failed to create tile mesh component for tile %d,%d"), i, j);
-					continue;
-				}
-
-				TileMesh->SetupAttachment(RootComponent);
-
-				if (TileMeshAsset)
-				{
-					TileMesh->SetStaticMesh(TileMeshAsset);
-				}
-				else
-				{
-					UE_LOG(LogTemp, Warning, TEXT("TileMeshAsset is null for tile %d,%d"), i, j);
-				}
-
-				FVector TileLocation{ j * 100.0f, i * 100.0f, 0.0f }; 
-				TileMesh->SetRelativeLocation(TileLocation);
-				TileMesh->SetRelativeScale3D(FVector{ 1.0f, 1.0f, 1.0f }); 
-
-				// set up replication only if we're in a networked context
-				if (GetWorld() && GetWorld()->GetNetMode() != NM_Standalone)
-				{
-					TileMesh->SetIsReplicated(true);
-					TileMesh->SetNetAddressable();
-				}
-
-				// set default material
-				if (DefaultTileMaterial)
-				{
-					TileMesh->SetMaterial(0, DefaultTileMaterial);
-				}
-				else
-				{
-					UE_LOG(LogTemp, Warning, TEXT("DefaultTileMaterial is null for tile %d,%d"), i, j);
-				}
-
-				// store reference to mesh
-				TileMeshes.Add(TileMesh);
-
-				// create FTile with reference to the mesh component
-				FTile Tile{ TileMesh, CCoords };
-				Tile.Center = TileLocation; // Set center manually.. make const later and calculate in constructor.
-
-				// add to collections
-				Tiles.Add(Tile);
-				TileMap.emplace(CCoords, Tile);
-
-				TileIndex++;
+				UE_LOG(LogTemp, Error, TEXT("Failed to create tile mesh component for tile %d,%d"), i, j);
+				continue;
 			}
+
+			TileMesh->SetupAttachment(RootComponent);
+
+			if (TileMeshAsset)
+			{
+				TileMesh->SetStaticMesh(TileMeshAsset);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("TileMeshAsset is null for tile %d,%d"), i, j);
+			}
+
+			FVector TileLocation{ j * 100.0f, i * 100.0f, 0.0f }; 
+			TileMesh->SetRelativeLocation(TileLocation);
+			TileMesh->SetRelativeScale3D(FVector{ 1.0f, 1.0f, 1.0f }); 
+
+			// Always set replciated
+			TileMesh->SetIsReplicated(true);
+			TileMesh->SetNetAddressable();
+
+			// set default material
+			if (DefaultTileMaterial)
+			{
+				TileMesh->SetMaterial(0, DefaultTileMaterial);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("DefaultTileMaterial is null for tile %d,%d"), i, j);
+			}
+
+			// store reference to mesh
+			TileMeshes.Add(TileMesh);
+
+			// create FTile with reference to the mesh component
+			FTile Tile{ TileMesh, CCoords };
+			Tile.Center = TileLocation; // Set center manually.. make const later and calculate in constructor.
+
+			// add to collections
+			Tiles.Add(Tile);
+			TileMap.emplace(CCoords, Tile);
+
+			TileIndex++;
 		}
 	}
 
@@ -293,17 +301,18 @@ void ABoard::MulticastMovePiece_Implementation(FVector Location)
 	const FTransform RootXf = RootComponent ? RootComponent->GetComponentTransform() : GetActorTransform();
 	const FVector WorldTarget = RootXf.TransformPosition(Location) + FVector(0.0, 0.0, 5.0);
 
-	// 3) Make sure the piece is visible & interactable
+
+	/*
 	P->SetHiddenInGame(false);
 	P->SetVisibility(true, true);
 	P->SetRenderInMainPass(true);
 	P->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	P->SetCollisionResponseToAllChannels(ECR_Block);
-	P->SetRelativeScale3D(FVector(0.035f)); // or temporarily bigger while debugging
+	P->SetRelativeScale3D(FVector(0.035f)); 
+	*/
 
 	// 4) Move it
 	const FVector CurrentPos = P->GetComponentLocation();
-	//UE_LOG(LogTemp, Warning, TEXT("Current=(%f,%f,%f)  Target(world)=(%f,%f,%f)"),CurrentPos.X, CurrentPos.Y, CurrentPos.Z, WorldTarget.X, WorldTarget.Y, WorldTarget.Z);
 
 	P->SetWorldLocation(WorldTarget, /*bSweep=*/true);
 
@@ -330,6 +339,12 @@ void ABoard::MulticastMovePiece_Implementation(FVector Location)
 	}
 }
 
+
+void ABoard::Highlight()
+{
+	UE_LOG(LogTemp, Warning, TEXT("[%s]: Player is looking at this object"), ANSI_TO_TCHAR(__FUNCTION__));
+};
+
 void ABoard::Interact(APlayerState* Player)
 {
 	if (PlayerPieces.IsEmpty())
@@ -345,6 +360,8 @@ void ABoard::Interact(APlayerState* Player)
 	BoardManager->ServerHandleRequest(Player);
 	MulticastMovePiece(Location);
 }
+
+
 
 void cb(AActor* A = nullptr)
 {
