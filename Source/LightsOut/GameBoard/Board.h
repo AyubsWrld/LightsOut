@@ -10,6 +10,7 @@
 #include "Tile.h"
 #include "LightsOut/Utility/ProcGen.h"
 #include "LightsOut/Generics/Interactable.h"
+#include "LightsOut/LightsOutCharacter.h"
 #include "LightsOut/Core/BoardManager.h"
 #include "ProceduralMeshComponent.h"
 #include "Engine/World.h"
@@ -21,17 +22,6 @@
 #define HEIGHT 5
 #define WIDTH  5
 
-
-const unsigned char BoardConfiguration[HEIGHT][WIDTH] =
-{
-    {'#','#','#','#','#'},
-    {'#','#','#','#','#'},
-    {'#','#','#','#','#'},
-    {'#','#','#','#','#'},
-    {'#','#','#','#','#'}
-};
-
-/* Check size ( guessing decreasing size order right now )*/
 struct FTile
 {
     UStaticMeshComponent* MeshComponent{};
@@ -44,7 +34,6 @@ struct FTile
     {}
     FTile() = delete;
 };
-
 
 template<>
 struct std::hash<std::pair<int32,int32>>
@@ -95,7 +84,7 @@ public:
     void MulticastMovePiece(FVector Location);
 
     UFUNCTION()
-    void HandleOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+    void HandleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
         UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
         bool bFromSweep, const FHitResult& SweepResult);
 
@@ -110,6 +99,12 @@ public:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
     UBoxComponent* BoxCollider;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
+    TArray<TObjectPtr<ALightsOutCharacter>> PlayersInColliderVolume;
+
+    UFUNCTION()
+	void HandleEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
     void SetTileColor(const std::pair<int32, int32>& Coordinates, FLinearColor NewColor);
 

@@ -16,9 +16,16 @@ ABoard::ABoard()
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	BoxCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("Collision Box"));
 
+	/* Box Collision Volume Setup */
 	BoxCollider->SetupAttachment(RootComponent);
 	BoxCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	BoxCollider->OnComponentBeginOverlap.AddDynamic(this,&ABoard::HandleOverlap);
+	BoxCollider->SetGenerateOverlapEvents(true);
+	BoxCollider->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	BoxCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+
+	BoxCollider->OnComponentBeginOverlap.AddDynamic(this,&ABoard::HandleBeginOverlap);
+	BoxCollider->OnComponentEndOverlap.AddDynamic(this, &ABoard::HandleEndOverlap);
+
 
 	SetReplicates(true);
 	SetReplicateMovement(true);
@@ -61,13 +68,17 @@ void ABoard::BeginPlay()
 	SpawnPlayers();
 }
 
-void ABoard::HandleOverlap(
+void ABoard::HandleBeginOverlap(
 	UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 	bool bFromSweep, const FHitResult& SweepResult
 )
 {
-	UE_LOG(LogTemp, Warning, TEXT("Overlapping occured"));
+	if (ALightsOutCharacter* Player{ Cast<ALightsOutCharacter>(OtherActor) }; Player)
+	{ 
+		PlayersInColliderVolume.AddUnique(TObjectPtr<ALightsOutCharacter>(Player));
+		UE_LOG(LogTemp, Warning, TEXT("Player %d Entered, Players in volume: %d"), Player->GetPlayerState()->GetPlayerId(), PlayersInColliderVolume.Num());
+	}
 }
 
 void ABoard::Tick(float DeltaTime)
@@ -231,6 +242,15 @@ const FVector& ABoard::GetTileLocation(const std::pair<int32, int32>& Coordinate
 	else
 	{
 		return FVector::ZeroVector;
+	}
+}
+
+/* Null out PlayersInColliderVolume */
+void ABoard::HandleEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (ALightsOutCharacter* Player{ Cast<ALightsOutCharacter>(OtherActor) }; Player)
+	{
+		PlayersInColliderVolume.RemoveSingle(TObjectPtr<ALightsOutCharacter>(Player));
 	}
 }
 
