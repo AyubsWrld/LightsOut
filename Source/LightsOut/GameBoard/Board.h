@@ -109,7 +109,7 @@ public:
     void SetTileColor(const std::pair<int32, int32>& Coordinates, FLinearColor NewColor);
 
     void SetTileMaterial(const std::pair<int32, int32>& Coordinates, UMaterialInterface* NewMaterial);
-    void IsViewInterest();
+    bool IsViewInterest();
 
     void SpawnPlayers();
 

@@ -85,7 +85,13 @@ void ABoard::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bQueryIsInterest) IsViewInterest();
+	if (bQueryIsInterest)
+	{
+		if (IsViewInterest())
+		{
+			//Highlight();
+		}
+	}
 }
 
 void ABoard::CreateGrid()
@@ -363,7 +369,7 @@ void ABoard::MulticastMovePiece_Implementation(FVector Location)
 
 void ABoard::Highlight()
 {
-	UE_LOG(LogTemp, Warning, TEXT("[%s]: Player is looking at this object"), ANSI_TO_TCHAR(__FUNCTION__));
+	DrawDebugBox(GetWorld(), RootComponent->GetComponentLocation(), FVector{100.0f, 100.0f, 100.0f }, FColor::Red, false, 1.0f, 0.0f, 5.0f);
 };
 
 void ABoard::Interact(APlayerState* Player)
@@ -383,7 +389,7 @@ void ABoard::Interact(APlayerState* Player)
 }
 
 
-void ABoard::IsViewInterest()
+bool ABoard::IsViewInterest()
 {
 	FHitResult HitResult; 
 	FCollisionQueryParams Parameters; 
@@ -402,19 +408,21 @@ void ABoard::IsViewInterest()
 				Parameters
 			);
 
+			if (UPrimitiveComponent* P{ HitResult.GetComponent() }; P )
+			{
+				DrawDebugBox(GetWorld(), P->GetComponentLocation(), FVector{50.0f, 50.0f, 10.0f }, FColor::Cyan , false, 0.1f, 0.0f, 2.0f);
+			}
+
 			if (HitResult.bBlockingHit && IsValid(HitResult.GetActor()))
 			{
 				if (ABoard* Board{ Cast<ABoard>(HitResult.GetActor()) }; Board)
 				{
-					UE_LOG(LogTemp, Warning, TEXT("Hit a board"));
-				}
-				else
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Hit something else: %s"), *HitResult.GetActor()->GetActorNameOrLabel() );
+					return true;
 				}
 			}
 		}
 	}
+	return false;
 }
 
 
