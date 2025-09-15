@@ -76,8 +76,8 @@ void ABoard::HandleBeginOverlap(
 {
 	if (ALightsOutCharacter* Player{ Cast<ALightsOutCharacter>(OtherActor) }; Player)
 	{ 
+		if (PlayersInColliderVolume.Num() == 0) { bQueryIsInterest = true; }
 		PlayersInColliderVolume.AddUnique(TObjectPtr<ALightsOutCharacter>(Player));
-		UE_LOG(LogTemp, Warning, TEXT("Player %d Entered, Players in volume: %d"), Player->GetPlayerState()->GetPlayerId(), PlayersInColliderVolume.Num());
 	}
 }
 
@@ -85,6 +85,7 @@ void ABoard::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bQueryIsInterest) IsViewInterest();
 }
 
 void ABoard::CreateGrid()
@@ -245,12 +246,12 @@ const FVector& ABoard::GetTileLocation(const std::pair<int32, int32>& Coordinate
 	}
 }
 
-/* Null out PlayersInColliderVolume */
 void ABoard::HandleEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	if (ALightsOutCharacter* Player{ Cast<ALightsOutCharacter>(OtherActor) }; Player)
 	{
 		PlayersInColliderVolume.RemoveSingle(TObjectPtr<ALightsOutCharacter>(Player));
+		if (PlayersInColliderVolume.Num() == 0) { bQueryIsInterest = false; }
 	}
 }
 
@@ -379,6 +380,41 @@ void ABoard::Interact(APlayerState* Player)
 	UBoardManager* BoardManager = GetWorld()->GetSubsystem<UBoardManager>();
 	BoardManager->ServerHandleRequest(Player);
 	MulticastMovePiece(Location);
+}
+
+
+void ABoard::IsViewInterest()
+{
+	FHitResult HitResult; 
+	FCollisionQueryParams Parameters; 
+
+	for (TObjectPtr<ALightsOutCharacter> Player : PlayersInColliderVolume)
+	{
+		if (const UCameraComponent* const PlayerCamera{ Player->GetFirstPersonCameraComponent() }; PlayerCamera)
+		{
+			Parameters.AddIgnoredActor(Player);
+			FVector    Start{ PlayerCamera->GetComponentLocation() };
+			GetWorld()->LineTraceSingleByChannel(
+				HitResult,
+				Start,
+				Start + (PlayerCamera->GetForwardVector() * 1000.0f),
+				ECollisionChannel::ECC_WorldDynamic,
+				Parameters
+			);
+
+			if (HitResult.bBlockingHit && IsValid(HitResult.GetActor()))
+			{
+				if (ABoard* Board{ Cast<ABoard>(HitResult.GetActor()) }; Board)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Hit a board"));
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Hit something else: %s"), *HitResult.GetActor()->GetActorNameOrLabel() );
+				}
+			}
+		}
+	}
 }
 
 

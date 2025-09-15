@@ -109,14 +109,7 @@ public:
     void SetTileColor(const std::pair<int32, int32>& Coordinates, FLinearColor NewColor);
 
     void SetTileMaterial(const std::pair<int32, int32>& Coordinates, UMaterialInterface* NewMaterial);
-
-    UStaticMeshComponent* GetTileMesh(const std::pair<int32, int32>& Coordinates) const;
-
-    TArray<UMaterialInterface*> Textures;
-
-    TArray<FTile> Tiles;
-
-    std::unordered_map<std::pair<int32, int32>, FTile> TileMap;
+    void IsViewInterest();
 
     void SpawnPlayers();
 
@@ -129,7 +122,19 @@ public:
     const FVector& GetTileLocation(const std::pair<int32,int32>& Coordinates) const;
 
     void Highlight(); 
+
 	virtual void Interact(APlayerState* Player) override ; 
+
+
+    UStaticMeshComponent* GetTileMesh(const std::pair<int32, int32>& Coordinates) const;
+
+    TArray<UMaterialInterface*> Textures;
+
+    TArray<FTile> Tiles;
+
+    std::unordered_map<std::pair<int32, int32>, FTile> TileMap;
+    
+    bool bQueryIsInterest;
 
 protected:
     virtual void BeginPlay() override;
