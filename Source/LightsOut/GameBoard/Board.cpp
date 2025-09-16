@@ -1,4 +1,4 @@
-﻿#include "Board.h"
+﻿#include "LightsOut/Core/BoardManager.h"
 
 void ABoard::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -194,7 +194,7 @@ void ABoard::SpawnPlayers()
 
 			FVector StartPos{ Tile.Center + RootComponent->GetComponentLocation() };
 			PMesh->SetWorldLocation(FVector{ StartPos + FVector{0.0f, 0.0f, 5.0f} });
-			PMesh->SetWorldScale3D(FVector{ 0.25f, 0.25f, 0.25f });
+			PMesh->SetWorldScale3D(FVector{ 1.f, 1.f, 1.f });
 
 			// Register the component so it gets properly updated
 			PMesh->RegisterComponent();
@@ -314,57 +314,6 @@ UStaticMeshComponent* ABoard::GetTileMesh(const std::pair<int32, int32>& Coordin
 	return nullptr;
 }
 
-void ABoard::MulticastMovePiece_Implementation(FVector Location)
-{
-	// 1) Input sanity
-	if (Location.IsZero()) return;
-	if (!PlayerPieces.IsValidIndex(0)) return;
-
-	UStaticMeshComponent* P = PlayerPieces[0];
-
-	if (!P) return;
-
-	// 2) Convert tile-local -> world (board root space -> world)
-	const FTransform RootXf = RootComponent ? RootComponent->GetComponentTransform() : GetActorTransform();
-	const FVector WorldTarget = RootXf.TransformPosition(Location) + FVector(0.0, 0.0, 5.0);
-
-
-	/*
-	P->SetHiddenInGame(false);
-	P->SetVisibility(true, true);
-	P->SetRenderInMainPass(true);
-	P->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	P->SetCollisionResponseToAllChannels(ECR_Block);
-	P->SetRelativeScale3D(FVector(0.035f)); 
-	*/
-
-	// 4) Move it
-	const FVector CurrentPos = P->GetComponentLocation();
-
-	P->SetWorldLocation(WorldTarget, /*bSweep=*/true);
-
-	// 5) Loud debug viz at the target
-	if (UWorld* W = GetWorld())
-	{
-		DrawDebugBox(W, WorldTarget, FVector(6, 6, 6), FColor::Yellow, /*bPersist=*/true, /*LifeTime=*/10.f, /*DepthPri=*/0, /*Thickness=*/2.f);
-		DrawDebugLine(W, WorldTarget, WorldTarget + FVector(0, 0, 120), FColor::Red, true, 10.f, 0, 2.f);
-		DrawDebugString(W, WorldTarget + FVector(0, 0, 130), TEXT("PlayerPiece Target"), nullptr, FColor::White, 10.f, true);
-	}
-
-	// 6) Optional: make it red so you notice it
-	if (UMaterialInterface* Base = P->GetMaterial(0))
-	{
-		if (UMaterialInstanceDynamic* Dyn = UMaterialInstanceDynamic::Create(Base, this))
-		{
-			static const FLinearColor Red = FLinearColor::Red;
-			Dyn->SetVectorParameterValue(FName("BaseColor"), Red);
-			Dyn->SetVectorParameterValue(FName("Color"), Red);
-			Dyn->SetVectorParameterValue(FName("Albedo"), Red);
-			Dyn->SetVectorParameterValue(FName("Diffuse"), Red);
-			P->SetMaterial(0, Dyn);
-		}
-	}
-}
 
 
 void ABoard::Highlight()
@@ -372,22 +321,55 @@ void ABoard::Highlight()
 	DrawDebugBox(GetWorld(), RootComponent->GetComponentLocation(), FVector{100.0f, 100.0f, 100.0f }, FColor::Red, false, 1.0f, 0.0f, 5.0f);
 };
 
+/* Depends on if it is the players turn or not */
+/* Make this work with the players camera on the server side */
+
 void ABoard::Interact(APlayerState* Player)
 {
 	if (PlayerPieces.IsEmpty())
 		return;
 
-	std::pair<int32, int32> TargetCoords{ 3,3 };
-	const FVector& Location = GetTileLocation(TargetCoords);
+	FHitResult HitResult;
+	FCollisionQueryParams Parameters;
 
-	// Example: Change tile color when interacting
-	SetTileColor(TargetCoords, FLinearColor::Green);
+	for (TObjectPtr<ALightsOutCharacter> Player_P : PlayersInColliderVolume)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("(%d) =? (%d)"), Player_P->GetPlayerState()->GetPlayerId(), Player->GetPlayerId());
 
-	UBoardManager* BoardManager = GetWorld()->GetSubsystem<UBoardManager>();
-	BoardManager->ServerHandleRequest(Player);
-	MulticastMovePiece(Location);
+		// Use continue instead of return to check next player
+		if (Player_P->GetPlayerState()->GetPlayerId() != Player->GetPlayerId())
+			continue;
+
+		UE_LOG(LogTemp, Warning, TEXT("Found Matching Player state"));
+
+		if (const UCameraComponent* const PlayerCamera = Player_P->GetFirstPersonCameraComponent(); PlayerCamera)
+		{
+			Parameters.AddIgnoredActor(Player_P);
+			FVector Start = PlayerCamera->GetComponentLocation();
+
+			bool bHit = GetWorld()->LineTraceSingleByChannel(
+				HitResult,
+				Start,
+				Start + (PlayerCamera->GetForwardVector() * 1000.0f),
+				ECollisionChannel::ECC_WorldDynamic,
+				Parameters
+			);
+
+			if (bHit && HitResult.GetComponent())
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Component (%s) hit"), *HitResult.GetComponent()->GetFName().ToString());
+
+				if (UBoardManager* BoardManager = GetWorld()->GetSubsystem<UBoardManager>())
+				{
+					// Pass the hit location instead of the component
+					BoardManager->ServerHandleRequest(Player, this, HitResult.GetComponent());
+				}
+			}
+
+			break; // Found the matching player, exit loop
+		}
+	}
 }
-
 
 bool ABoard::IsViewInterest()
 {
@@ -425,6 +407,9 @@ bool ABoard::IsViewInterest()
 	return false;
 }
 
+
+/* Currently relies on checking within the PlayersInCollision volume deriving the player states from the player controllers */
+/* functionally makes sense because the player would have to be within the collider volume of the board to be able to interact with it */
 
 
 void cb(AActor* A = nullptr)

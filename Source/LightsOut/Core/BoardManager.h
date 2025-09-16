@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "GameFramework/PlayerState.h"
+#include "LightsOut/GameBoard/Board.h"
 #include "BoardManager.generated.h"
 
 /**
@@ -34,9 +35,12 @@ class LIGHTSOUT_API UBoardManager : public UWorldSubsystem
 
 public:
 
+    UFUNCTION(Reliable, NetMulticast)
+    void MulticastMovePiece(FVector Location, ABoard* Board);
 	UFUNCTION(Reliable, Server)
-	[[nodiscard]] void ServerHandleRequest(APlayerState* Player) ; 
+	[[nodiscard]] void ServerHandleRequest(APlayerState* Player, ABoard* Board, UPrimitiveComponent* Component) ; 
 
+	bool IsPlayersTurn(APlayerState* Player) ; 
 	TObjectPtr<APlayerController> GetActivePlayer() const; 
 
 	void SetActivePlayer(int32 Index) ; 

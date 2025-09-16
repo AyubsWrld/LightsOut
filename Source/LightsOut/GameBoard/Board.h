@@ -11,7 +11,6 @@
 #include "LightsOut/Utility/ProcGen.h"
 #include "LightsOut/Generics/Interactable.h"
 #include "LightsOut/LightsOutCharacter.h"
-#include "LightsOut/Core/BoardManager.h"
 #include "ProceduralMeshComponent.h"
 #include "Engine/World.h"
 #include "UObject/ConstructorHelpers.h"
@@ -21,6 +20,8 @@
 
 #define HEIGHT 5
 #define WIDTH  5
+
+class UBoardManager;
 
 struct FTile
 {
@@ -80,8 +81,6 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board", Replicated)
     TArray<UStaticMeshComponent*> PlayerPieces;
-    UFUNCTION(Reliable, NetMulticast)
-    void MulticastMovePiece(FVector Location);
 
     UFUNCTION()
     void HandleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
@@ -107,11 +106,10 @@ public:
 	void HandleEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
     void SetTileColor(const std::pair<int32, int32>& Coordinates, FLinearColor NewColor);
-
     void SetTileMaterial(const std::pair<int32, int32>& Coordinates, UMaterialInterface* NewMaterial);
     bool IsViewInterest();
-
     void SpawnPlayers();
+
 
     void TestGrid();
 
@@ -125,7 +123,6 @@ public:
 
 	virtual void Interact(APlayerState* Player) override ; 
 
-
     UStaticMeshComponent* GetTileMesh(const std::pair<int32, int32>& Coordinates) const;
 
     TArray<UMaterialInterface*> Textures;
@@ -136,11 +133,12 @@ public:
     
     bool bQueryIsInterest;
 
+    friend class UBoardmanager;
+
 protected:
     virtual void BeginPlay() override;
 
 public:
-
 
     virtual void Tick(float DeltaTime) override;
 
