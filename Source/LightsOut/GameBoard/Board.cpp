@@ -329,46 +329,8 @@ void ABoard::Interact(APlayerState* Player)
 	if (PlayerPieces.IsEmpty())
 		return;
 
-	FHitResult HitResult;
-	FCollisionQueryParams Parameters;
-
-	for (TObjectPtr<ALightsOutCharacter> Player_P : PlayersInColliderVolume)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("(%d) =? (%d)"), Player_P->GetPlayerState()->GetPlayerId(), Player->GetPlayerId());
-
-		// Use continue instead of return to check next player
-		if (Player_P->GetPlayerState()->GetPlayerId() != Player->GetPlayerId())
-			continue;
-
-		UE_LOG(LogTemp, Warning, TEXT("Found Matching Player state"));
-
-		if (const UCameraComponent* const PlayerCamera = Player_P->GetFirstPersonCameraComponent(); PlayerCamera)
-		{
-			Parameters.AddIgnoredActor(Player_P);
-			FVector Start = PlayerCamera->GetComponentLocation();
-
-			bool bHit = GetWorld()->LineTraceSingleByChannel(
-				HitResult,
-				Start,
-				Start + (PlayerCamera->GetForwardVector() * 1000.0f),
-				ECollisionChannel::ECC_WorldDynamic,
-				Parameters
-			);
-
-			if (bHit && HitResult.GetComponent())
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Component (%s) hit"), *HitResult.GetComponent()->GetFName().ToString());
-
-				if (UBoardManager* BoardManager = GetWorld()->GetSubsystem<UBoardManager>())
-				{
-					// Pass the hit location instead of the component
-					BoardManager->ServerHandleRequest(Player, this, HitResult.GetComponent());
-				}
-			}
-
-			break; // Found the matching player, exit loop
-		}
-	}
+	UBoardManager* BoardManager{ GetWorld()->GetSubsystem<UBoardManager>() };
+	BoardManager->ServerHandleRequest(Player, this);
 }
 
 bool ABoard::IsViewInterest()

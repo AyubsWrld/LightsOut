@@ -38,7 +38,7 @@ public:
     UFUNCTION(Reliable, NetMulticast)
     void MulticastMovePiece(FVector Location, ABoard* Board);
 	UFUNCTION(Reliable, Server)
-	[[nodiscard]] void ServerHandleRequest(APlayerState* Player, ABoard* Board, UPrimitiveComponent* Component) ; 
+	[[nodiscard]] void ServerHandleRequest(APlayerState* Player, ABoard* Board);
 
 	bool IsPlayersTurn(APlayerState* Player) ; 
 	TObjectPtr<APlayerController> GetActivePlayer() const; 

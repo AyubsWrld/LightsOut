@@ -34,48 +34,40 @@ void UBoardManager::Initialize(FSubsystemCollectionBase& Collection)
 	FDelegateHandle DispatchFunction{ GetWorld()->AddOnActorSpawnedHandler(ActorSpawnedDelegate) };
 }
 
-void UBoardManager::ServerHandleRequest_Implementation(APlayerState* Player, ABoard* Board, UPrimitiveComponent* Component) 
+void UBoardManager::ServerHandleRequest_Implementation(APlayerState* Player, ABoard* Board)
 {
-	if (!Player)
-		return;
 
 	UWorld* World{ Board->GetWorld() };
+	APlayerController* PC{ GetActivePlayer() };
 
-	if (!World)
-		return;
+	if (!World || PC->PlayerState->GetPlayerId() != Player->GetPlayerId() || !Player ) return;
 
-	if (IsPlayersTurn(Player))
+	if (ALightsOutCharacter* Character{ Cast<ALightsOutCharacter>(PC->GetPawn()) }; Character)
 	{
-		if (auto P{GetActivePlayer()}; P)
+		UCameraComponent* Camera = Character->GetFirstPersonCameraComponent();
+		FRotator ControlRotation = Character->GetControlRotation();
+		FVector Start = Camera->GetComponentLocation();
+		FVector End = Start + (ControlRotation.Vector() * 1000.0f);
+		FHitResult HitResult;
+		FCollisionQueryParams Params;
+
+		Params.AddIgnoredActor(Character);
+
+		GetWorld()->LineTraceSingleByChannel(
+			HitResult,
+			Start,
+			End,
+			ECollisionChannel::ECC_WorldDynamic,
+			Params	
+		);
+		
+		if (UPrimitiveComponent* P{ HitResult.GetComponent() }; P )
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Getting active player"));
-			if (APlayerState* PlayerState{ P->PlayerState.Get() }; PlayerState)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Player is well defined"));
-				if (ALightsOutCharacter* LP{ Cast<ALightsOutCharacter>(P->GetPawn()) }; LP)
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Player is well defined"));
-					UCameraComponent* Camera = LP->GetFirstPersonCameraComponent();
-					DrawDebugLine(
-						World,
-						Camera->GetComponentLocation(),
-						Camera->GetComponentLocation() + (Camera->GetForwardVector() * 1000.0f),
-						FColor::Red,
-						true,
-						-1.0f,
-						0,
-						3.00f
-					);
-				}
-			}
-		}
-		if (Component)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Component (%s) hit"), *Component->GetFName().ToString());
-			MulticastMovePiece(Component->GetComponentLocation(), Board);
+			FVector Location = P->GetComponentLocation();
+			UE_LOG(LogTemp, Warning, TEXT("Hit something: %s, (%f,%f,%f)"), *P->GetFName().ToString(), Location.X, Location.Y, Location.Z);
+			MulticastMovePiece(Location, Board);
 		}
 	}
-	return;
 }
 
 void UBoardManager::MulticastGreetPlayers_Implementation() const
@@ -125,44 +117,14 @@ bool UBoardManager::IsPlayersTurn(APlayerState* Player)
 	return false;
 }
 
-
 void UBoardManager::MulticastMovePiece_Implementation(FVector Location, ABoard* Board)
 {
 	if (!Board)
 		return;
 
-	UWorld* World{ Board->GetWorld() };
+	UWorld* World = Board->GetWorld();
 	if (!World)
 		return;
-
-	// 1) Input sanity
-	if (Location.IsZero()) return;
-	if (!Board->PlayerPieces.IsValidIndex(0)) return;
-
-	UStaticMeshComponent* P = Board->PlayerPieces[0];
-
-	if (!P) return;
-
-	// 2) Convert tile-local -> world (board root space -> world)
-
-	USceneComponent* RootComponent{ Board->GetRootComponent() };
-	const FTransform RootXf = RootComponent ? RootComponent->GetComponentTransform() : Board->GetActorTransform();
-	const FVector WorldTarget = RootXf.TransformPosition(Location) + FVector(0.0, 0.0, 5.0);
-
-
-	/*
-	P->SetHiddenInGame(false);
-	P->SetVisibility(true, true);
-	P->SetRenderInMainPass(true);
-	P->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	P->SetCollisionResponseToAllChannels(ECR_Block);
-	P->SetRelativeScale3D(FVector(0.035f)); 
-	*/
-
-	// 4) Move it
-	const FVector CurrentPos = P->GetComponentLocation();
-
-	P->SetWorldLocation(WorldTarget, /*bSweep=*/true);
 
 }
 

@@ -105,6 +105,8 @@ public:
     UFUNCTION()
 	void HandleEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+
+
     void SetTileColor(const std::pair<int32, int32>& Coordinates, FLinearColor NewColor);
     void SetTileMaterial(const std::pair<int32, int32>& Coordinates, UMaterialInterface* NewMaterial);
     bool IsViewInterest();
