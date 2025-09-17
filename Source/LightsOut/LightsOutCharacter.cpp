@@ -154,7 +154,6 @@ void ALightsOutCharacter::ServerHandleEquipRequest_Implementation(AItemBase* Ite
 void ALightsOutCharacter::Interact(const FInputActionValue& Value)
 {
 	FRotator Rotation = FirstPersonCameraComponent->GetComponentRotation();
-	UE_LOG(LogTemp, Warning, TEXT("%f, %f, %f"), Rotation.Roll, Rotation.Pitch, Rotation.Yaw);
 	ServerHandleInteractionRequest();
 }
 

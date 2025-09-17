@@ -1,5 +1,14 @@
 ﻿#include "LightsOut/Core/BoardManager.h"
 
+
+/*----------------------------------------------- NM_UTILS ---------------------------------------------*/
+
+void LogFVector(const FVector& F) 
+{
+	UE_LOG(LogTemp, Warning, TEXT("[%s]: (%f,%f,%f)"), ANSI_TO_TCHAR(__FUNCTION__), F.X, F.Y, F.Z );
+}
+
+/*----------------------------------------------- NM_UTILS ---------------------------------------------*/
 void ABoard::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -239,7 +248,6 @@ void ABoard::DebugStartingPoints()
 
 const FVector& ABoard::GetTileLocation(const std::pair<int32, int32>& Coordinates) const
 {
-	// FIXED: Check WIDTH for the second coordinate instead of HEIGHT
 	if (Coordinates.first < 0 || Coordinates.first >= HEIGHT || Coordinates.second < 0 || Coordinates.second >= WIDTH)
 		return FVector::ZeroVector;
 	if (decltype(TileMap)::const_iterator it{ TileMap.find(Coordinates) }; it != TileMap.end())
@@ -321,14 +329,13 @@ void ABoard::Highlight()
 	DrawDebugBox(GetWorld(), RootComponent->GetComponentLocation(), FVector{100.0f, 100.0f, 100.0f }, FColor::Red, false, 1.0f, 0.0f, 5.0f);
 };
 
-/* Depends on if it is the players turn or not */
-/* Make this work with the players camera on the server side */
 
 void ABoard::Interact(APlayerState* Player)
 {
 	if (PlayerPieces.IsEmpty())
 		return;
 
+	LogFVector(GetTileLocation({ 3,3 }));
 	UBoardManager* BoardManager{ GetWorld()->GetSubsystem<UBoardManager>() };
 	BoardManager->ServerHandleRequest(Player, this);
 }

@@ -2,8 +2,6 @@
 
 
 #include "BoardManager.h"
-
-
 void UBoardManager::OnWorldBeginPlay(UWorld& InWorld)
 {
 	if (InWorld.GetNetMode() != ENetMode::NM_DedicatedServer)
@@ -12,10 +10,7 @@ void UBoardManager::OnWorldBeginPlay(UWorld& InWorld)
 
 bool UBoardManager::ShouldCreateSubsystem(UObject* Outer) const 
 {
-	/* We want to allow the player to always have access to this. */
-	//if (GetWorld()->GetNetMode() != ENetMode::NM_DedicatedServer && false )
-		//return false;
-	return true; // Always spawns
+	return true; 
 }
 
 void UBoardManager::Initialize(FSubsystemCollectionBase& Collection) 
@@ -34,6 +29,23 @@ void UBoardManager::Initialize(FSubsystemCollectionBase& Collection)
 	FDelegateHandle DispatchFunction{ GetWorld()->AddOnActorSpawnedHandler(ActorSpawnedDelegate) };
 }
 
+/*
+   @purpose:      Server side RPC invoked when a player interacts with the board. This 
+				  routine checks whether it is the invoking players turn, if so it conducts
+				  and a line trace, moving the players piece to the location of the line trace.
+
+   @param:        [in]                     APlayerState* Invoking players PlayerState used to 
+										   determine whether it is the players turn or not.
+
+   @param:        [in]                     ABoard*       Reference to gameboard actor.
+
+
+   @notes:        In progress, this routine shoudl be split up into different parts as it currently
+				  handles the LineTracing, Player Validation, and call to mutlicast delegate for moving 
+				  the players piece.
+
+   @todo:         
+*/
 void UBoardManager::ServerHandleRequest_Implementation(APlayerState* Player, ABoard* Board)
 {
 
@@ -68,6 +80,10 @@ void UBoardManager::ServerHandleRequest_Implementation(APlayerState* Player, ABo
 			MulticastMovePiece(Location, Board);
 		}
 	}
+
+	/* Update current players turn. */
+
+	UpdateCurrentPlayerIndex();
 }
 
 void UBoardManager::MulticastGreetPlayers_Implementation() const
@@ -97,6 +113,16 @@ void UBoardManager::SetActivePlayer(int32 Index)
 {
 };
 
+/*
+   @purpose:      Updates current players index which points to the playeys array. 
+				  Calls to GetActivePlayer rely on this index for retreiving the 
+				  player whose turn it is from the players container.
+
+   @notes:        In progress, currently movement replication breaks when called from the
+				  BoardManager.
+
+   @todo:         
+*/
 inline void UBoardManager::UpdateCurrentPlayerIndex() 
 {
 	CurrentPlayerIndex = ++CurrentPlayerIndex % PlayerStates.Num();
@@ -117,6 +143,19 @@ bool UBoardManager::IsPlayersTurn(APlayerState* Player)
 	return false;
 }
 
+/*
+   @purpose:      Moves players piece and replicates it across all clients. 
+
+   @param:        [in]                     FVector       Location to move piece to 
+
+   @param:        [in]                     ABoard*       Reference to gameboard actor.
+
+   @notes:        In progress, currently movement replication breaks when called from the
+				  BoardManager.
+
+   @todo:         
+*/
+
 void UBoardManager::MulticastMovePiece_Implementation(FVector Location, ABoard* Board)
 {
 	if (!Board)
@@ -126,7 +165,20 @@ void UBoardManager::MulticastMovePiece_Implementation(FVector Location, ABoard* 
 	if (!World)
 		return;
 
+	/* Draw simple debug here */
+
+
+	UE_LOG(LogTemp, Warning, TEXT("[%s]: (%f,%f,%f)"), ANSI_TO_TCHAR(__FUNCTION__), Location.X, Location.Y, Location.Z );
+
+	DrawDebugBox(
+		World,
+		Location,
+		FVector{ 50.0f,  50.0f,  10.0f },
+		FColor::Red,
+		true,
+		-1.0f,
+		0,
+		4.0f
+		);
 }
-
-
 
