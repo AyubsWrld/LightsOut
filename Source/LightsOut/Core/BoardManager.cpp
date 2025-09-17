@@ -152,7 +152,7 @@ bool UBoardManager::IsPlayersTurn(APlayerState* Player)
    @notes:        In progress, currently movement replication breaks when called from the
 				  BoardManager.
 
-   @todo:         
+   @todo:         Check whether location is valid. and falls within board dimensions. 
 */
 
 void UBoardManager::MulticastMovePiece_Implementation(FVector Location, ABoard* Board)
@@ -172,15 +172,5 @@ void UBoardManager::MulticastMovePiece_Implementation(FVector Location, ABoard* 
 
 	Piece->SetWorldLocation(Location);
 
-	DrawDebugBox(
-		World,
-		Location,
-		FVector{ 50.0f,  50.0f,  10.0f },
-		FColor::Red,
-		true,
-		-1.0f,
-		0,
-		4.0f
-		);
 }
 
