@@ -76,7 +76,6 @@ void UBoardManager::ServerHandleRequest_Implementation(APlayerState* Player, ABo
 		if (UPrimitiveComponent* P{ HitResult.GetComponent() }; P )
 		{
 			FVector Location = P->GetComponentLocation();
-			UE_LOG(LogTemp, Warning, TEXT("Hit something: %s, (%f,%f,%f)"), *P->GetFName().ToString(), Location.X, Location.Y, Location.Z);
 			MulticastMovePiece(Location, Board);
 		}
 	}
@@ -165,10 +164,13 @@ void UBoardManager::MulticastMovePiece_Implementation(FVector Location, ABoard* 
 	if (!World)
 		return;
 
-	/* Draw simple debug here */
-
-
 	UE_LOG(LogTemp, Warning, TEXT("[%s]: (%f,%f,%f)"), ANSI_TO_TCHAR(__FUNCTION__), Location.X, Location.Y, Location.Z );
+
+	UStaticMeshComponent* Piece{ Board->PlayerPieces[CurrentPlayerIndex] };
+
+	if (!Piece) return;
+
+	Piece->SetWorldLocation(Location);
 
 	DrawDebugBox(
 		World,

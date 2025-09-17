@@ -335,7 +335,8 @@ void ABoard::Interact(APlayerState* Player)
 	if (PlayerPieces.IsEmpty())
 		return;
 
-	LogFVector(GetTileLocation({ 3,3 }));
+	FVector Location = GetTileLocation({ 3,3 }) + RootComponent->GetComponentLocation();
+	LogFVector(Location);
 	UBoardManager* BoardManager{ GetWorld()->GetSubsystem<UBoardManager>() };
 	BoardManager->ServerHandleRequest(Player, this);
 }
