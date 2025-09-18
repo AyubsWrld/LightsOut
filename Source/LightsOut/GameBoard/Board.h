@@ -50,8 +50,10 @@ USTRUCT()
 struct FPlayerPiece
 {
     GENERATED_BODY()
+
     UStaticMeshComponent*  Mesh;
     std::pair<int32,int32> Coordinates;
+
 };
 
 UCLASS()
@@ -88,9 +90,7 @@ public:
     UStaticMesh* PlayerPieceModel;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board", Replicated)
-    //TArray<FPlayerPiece*> PlayerPieces;
     TArray<UStaticMeshComponent*> PlayerPieces;
-
     UFUNCTION()
     void HandleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
         UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,

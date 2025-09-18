@@ -209,6 +209,7 @@ void ABoard::SpawnPlayers()
 			//FPlayerPiece P{ Mesh: PMesh, Coordiantes:  };
 
 			PlayerPieces.Emplace(PMesh);
+
 		}
 	}
 }
@@ -226,7 +227,9 @@ void ABoard::SetStartingPoints()
 		for (; bit != eit; bit++)
 		{
 			std::pair<int32, int32> Coord{ *bit };
+			// Sanity check that coordinates actually exist. Checks hashmap 
 			if (decltype(TileMap)::const_iterator Tile{ TileMap.find(Coord) }; Tile != TileMap.end())
+				// Add to start tiles if it the coordinates exist in tile map (it should).
 				StartTiles.Emplace(Tile->second);
 		}
 	}
@@ -304,8 +307,6 @@ UStaticMeshComponent* ABoard::GetTileMesh(const std::pair<int32, int32>& Coordin
 	}
 	return nullptr;
 }
-
-
 
 void ABoard::Highlight()
 {
