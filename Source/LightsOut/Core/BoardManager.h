@@ -37,6 +37,7 @@ public:
 
     UFUNCTION(Reliable, NetMulticast)
     void MulticastMovePiece(FVector Location, ABoard* Board);
+
 	UFUNCTION(Reliable, Server)
 	[[nodiscard]] void ServerHandleRequest(APlayerState* Player, ABoard* Board);
 
@@ -46,5 +47,7 @@ public:
 	void SetActivePlayer(int32 Index) ; 
 
 	inline void UpdateCurrentPlayerIndex();
+
+	
 
 };

@@ -2,6 +2,23 @@
 
 
 #include "BoardManager.h"
+
+std::vector<std::pair<std::size_t, std::size_t>> GetValidMoves(
+	const std::pair<std::size_t, std::size_t>& dimensions,
+	const std::pair<std::size_t, std::size_t>& location,
+	double dist)
+{
+	std::vector<std::pair<std::size_t, std::size_t>> V;
+	for (std::size_t i{}; i < dimensions.first ; i++)
+		for (std::size_t j{}; j < dimensions.second ; j++)
+		{
+			auto dx = static_cast<double>(location.first) - i;
+			auto dy = static_cast<double>(location.second) - j;
+			if (std::sqrt(dx * dx + dy * dy) <= dist) V.push_back(std::pair<std::size_t, std::size_t>{i, j});
+		}
+	return V;
+}
+
 void UBoardManager::OnWorldBeginPlay(UWorld& InWorld)
 {
 	if (InWorld.GetNetMode() != ENetMode::NM_DedicatedServer)
@@ -53,6 +70,28 @@ void UBoardManager::ServerHandleRequest_Implementation(APlayerState* Player, ABo
 	APlayerController* PC{ GetActivePlayer() };
 
 	if (!World || PC->PlayerState->GetPlayerId() != Player->GetPlayerId() || !Player ) return;
+
+	std::vector<std::pair<std::size_t, std::size_t>> ValidMoves{
+		GetValidMoves({5u, 5u}, {2,2}, 2)
+	};
+
+	FVector VA{};
+
+	for (std::size_t i{}; i < std::size(ValidMoves); i++)
+	{
+		VA = Board->GetTileLocation(std::pair{ static_cast<std::size_t>(ValidMoves[i].first), static_cast<std::size_t>(ValidMoves[i].second) }) + Board->GetRootComponent()->GetComponentLocation();
+		UE_LOG(LogTemp, Warning, TEXT("(%f,%f,%f)"), VA.X, VA.Y, VA.Z);
+		DrawDebugBox(
+			World,
+			VA,
+			{ 50.0f, 50.0f, 10.0f },
+			FColor::Green,
+			true,
+			-1.0f,
+			0,
+			2
+		);
+	}
 
 	if (ALightsOutCharacter* Character{ Cast<ALightsOutCharacter>(PC->GetPawn()) }; Character)
 	{
