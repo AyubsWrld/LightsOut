@@ -12,10 +12,17 @@
  * 
  */
 
+enum class EBoardState
+{
+	EBS_AwaitingRoll,
+	EBS_AwaitingMove
+};
+
 UCLASS()
 class LIGHTSOUT_API UBoardManager : public UWorldSubsystem
 {
 	GENERATED_BODY()
+
 
 	virtual void OnWorldBeginPlay(UWorld& InWorld) override;
 
@@ -26,11 +33,11 @@ class LIGHTSOUT_API UBoardManager : public UWorldSubsystem
 	UFUNCTION(Reliable, NetMulticast)
 	void MulticastGreetPlayers() const; 
 
-	int32 CurrentPlayerIndex{};
+	int32 CurrentPlayerIndex;
 
+	EBoardState State; 
 	TArray<TObjectPtr<APlayerController>> PlayerStates;
 	/* ------------------------------------ Setup Functions ----------------------------------- */
-	
 	void BindPlayerControllers();
 
 public:
@@ -48,6 +55,10 @@ public:
 
 	inline void UpdateCurrentPlayerIndex();
 
-	
+	EBoardState GetBoardState() const { return State; };
+
+	void UpdateBoardState();
+
+	void RenderIndicators(ABoard* Board); 
 
 };

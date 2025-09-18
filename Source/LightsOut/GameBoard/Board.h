@@ -46,6 +46,14 @@ struct std::hash<std::pair<int32,int32>>
 };
 
 
+USTRUCT()
+struct FPlayerPiece
+{
+    GENERATED_BODY()
+    UStaticMeshComponent*  Mesh;
+    std::pair<int32,int32> Coordinates;
+};
+
 UCLASS()
 class LIGHTSOUT_API ABoard : public AActor, public IInteractable
 {
@@ -80,6 +88,7 @@ public:
     UStaticMesh* PlayerPieceModel;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board", Replicated)
+    //TArray<FPlayerPiece*> PlayerPieces;
     TArray<UStaticMeshComponent*> PlayerPieces;
 
     UFUNCTION()
@@ -112,10 +121,7 @@ public:
     bool IsViewInterest();
     void SpawnPlayers();
 
-
-    void TestGrid();
-
-    void DebugStartingPoints();
+    void SetStartingPoints();
 
     std::array<std::pair<int32, int32>, 4> GetBoardBounds();
 

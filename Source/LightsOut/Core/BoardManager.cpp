@@ -19,11 +19,26 @@ std::vector<std::pair<std::size_t, std::size_t>> GetValidMoves(
 	return V;
 }
 
+void UBoardManager::UpdateBoardState()
+{
+	using enum EBoardState;
+	switch (State)
+	{
+		case EBS_AwaitingRoll:
+			State = EBS_AwaitingMove;
+			break;
+		case EBS_AwaitingMove:
+			State = EBS_AwaitingRoll;
+			break;
+	}
+};
+
 void UBoardManager::OnWorldBeginPlay(UWorld& InWorld)
 {
 	if (InWorld.GetNetMode() != ENetMode::NM_DedicatedServer)
 		return;
 }
+
 
 bool UBoardManager::ShouldCreateSubsystem(UObject* Outer) const 
 {
@@ -71,26 +86,12 @@ void UBoardManager::ServerHandleRequest_Implementation(APlayerState* Player, ABo
 
 	if (!World || PC->PlayerState->GetPlayerId() != Player->GetPlayerId() || !Player ) return;
 
-	std::vector<std::pair<std::size_t, std::size_t>> ValidMoves{
-		GetValidMoves({5u, 5u}, {2,2}, 2)
-	};
 
-	FVector VA{};
-
-	for (std::size_t i{}; i < std::size(ValidMoves); i++)
+	if (GetBoardState() == EBoardState::EBS_AwaitingRoll)
 	{
-		VA = Board->GetTileLocation(std::pair{ static_cast<std::size_t>(ValidMoves[i].first), static_cast<std::size_t>(ValidMoves[i].second) }) + Board->GetRootComponent()->GetComponentLocation();
-		UE_LOG(LogTemp, Warning, TEXT("(%f,%f,%f)"), VA.X, VA.Y, VA.Z);
-		DrawDebugBox(
-			World,
-			VA,
-			{ 50.0f, 50.0f, 10.0f },
-			FColor::Green,
-			true,
-			-1.0f,
-			0,
-			2
-		);
+		RenderIndicators(Board);
+		UpdateBoardState();
+		return;
 	}
 
 	if (ALightsOutCharacter* Character{ Cast<ALightsOutCharacter>(PC->GetPawn()) }; Character)
@@ -118,9 +119,7 @@ void UBoardManager::ServerHandleRequest_Implementation(APlayerState* Player, ABo
 			MulticastMovePiece(Location, Board);
 		}
 	}
-
-	/* Update current players turn. */
-
+	UpdateBoardState();
 	UpdateCurrentPlayerIndex();
 }
 
@@ -173,11 +172,8 @@ bool UBoardManager::IsPlayersTurn(APlayerState* Player)
 	if (!Player) 
 		return false;
 	if (TObjectPtr<APlayerController> PC{ GetActivePlayer() }; PC)
-		if (TObjectPtr<APlayerState> State{ PC->PlayerState }; State)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Comparing PlayerID (%d) to Active Player (%d)"), Player->GetPlayerId(), State->GetPlayerId());
-			return Player->GetPlayerId() == State->GetPlayerId();
-		}
+		if (TObjectPtr<APlayerState> PState{ PC->PlayerState }; PState)
+			return Player->GetPlayerId() == PState->GetPlayerId();
 	return false;
 }
 
@@ -211,5 +207,50 @@ void UBoardManager::MulticastMovePiece_Implementation(FVector Location, ABoard* 
 
 	Piece->SetWorldLocation(Location);
 
+}
+
+/*
+   @purpose:      Performs Dice roll and renders indicator of valid moves a player can 
+				  make based on the moves result of the dice roll. 
+
+   @param:        [in]                     ABoard*       Reference to gameboard actor.
+
+   @notes:        In progress, currently movement replication breaks when called from the
+				  BoardManager.
+
+   @todo:         Seperate concerns of generating number from rendering indicator.
+*/
+
+
+void UBoardManager::RenderIndicators(ABoard* Board)
+{
+
+	int32 R1{ FMath::RandRange(1,6) };
+	int32 R2{ FMath::RandRange(1,6) };
+
+	int32 AllowedDistance{ FMath::Abs(R2 - R1) };
+
+	UE_LOG(LogTemp, Warning, TEXT("(%d,%d): %d"), R1, R2, AllowedDistance);
+	std::vector<std::pair<std::size_t, std::size_t>> ValidMoves{
+		GetValidMoves({5u, 5u}, {2,2}, AllowedDistance)
+	};
+
+	FVector VA{};
+
+	for (std::size_t i{}; i < std::size(ValidMoves); i++)
+	{
+		VA = Board->GetTileLocation(std::pair{ static_cast<std::size_t>(ValidMoves[i].first), static_cast<std::size_t>(ValidMoves[i].second) }) + Board->GetRootComponent()->GetComponentLocation();
+		UE_LOG(LogTemp, Warning, TEXT("(%f,%f,%f)"), VA.X, VA.Y, VA.Z);
+		DrawDebugBox(
+			Board->GetWorld(),
+			VA,
+			{ 50.0f, 50.0f, 10.0f },
+			FColor::Green,
+			false,
+			5.0f,
+			0,
+			2
+		);
+	}
 }
 

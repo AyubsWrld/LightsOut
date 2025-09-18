@@ -73,7 +73,7 @@ void ABoard::BeginPlay()
 		CreateGrid();
 	}
 
-	DebugStartingPoints();
+	SetStartingPoints();
 	SpawnPlayers();
 }
 
@@ -184,9 +184,8 @@ void ABoard::SpawnPlayers()
 	{
 		for (int32 i = 0; i < StartTiles.Num(); i++)
 		{
-			const auto& Tile = StartTiles[i];
+			const FTile& Tile = StartTiles[i];
 
-			// Create a NEW static mesh component for each player at runtime
 			UStaticMeshComponent* PMesh = NewObject<UStaticMeshComponent>(this, *FString::Printf(TEXT("PlayerPiece_%d"), i));
 			PMesh->SetupAttachment(RootComponent);
 
@@ -194,7 +193,7 @@ void ABoard::SpawnPlayers()
 			PMesh->SetNetAddressable();            // gives it a stable NetGUID
 			AddInstanceComponent(PMesh);           // make it an instance subobject of the actor
 
-			// Copy the mesh and material settings from PlayerPieceModel
+			// Copy the mesh and material settings from PlayerPeceModel
 			if (PlayerPieceModel)
 			{
 				PMesh->SetStaticMesh(PlayerPieceModel);
@@ -205,23 +204,16 @@ void ABoard::SpawnPlayers()
 			PMesh->SetWorldLocation(FVector{ StartPos + FVector{0.0f, 0.0f, 5.0f} });
 			PMesh->SetWorldScale3D(FVector{ 1.f, 1.f, 1.f });
 
-			// Register the component so it gets properly updated
 			PMesh->RegisterComponent();
+
+			//FPlayerPiece P{ Mesh: PMesh, Coordiantes:  };
 
 			PlayerPieces.Emplace(PMesh);
 		}
 	}
 }
 
-void ABoard::TestGrid()
-{
-	decltype(TileMap)::const_iterator bit{ TileMap.begin() };
-	decltype(TileMap)::const_iterator eit{ TileMap.end() };
-	for (; bit != eit; bit++)
-		UE_LOG(LogTemp, Warning, TEXT("Tile Coord: (%d, %d)"), bit->first.first, bit->first.second);
-}
-
-void ABoard::DebugStartingPoints()
+void ABoard::SetStartingPoints()
 {
 	auto World{ GetWorld() };
 	if (!World)
@@ -233,19 +225,12 @@ void ABoard::DebugStartingPoints()
 		decltype(SPoints)::const_iterator eit{ SPoints.end() };
 		for (; bit != eit; bit++)
 		{
-			auto Coord{ *bit };
+			std::pair<int32, int32> Coord{ *bit };
 			if (decltype(TileMap)::const_iterator Tile{ TileMap.find(Coord) }; Tile != TileMap.end())
-			{
-				/* decltype(Tile) -> TTuple<std::pair<int32,int32>, FTile> */
 				StartTiles.Emplace(Tile->second);
-				FVector Start{ Tile->second.Center + RootComponent->GetComponentLocation() };
-				FVector End{ Start + FVector{0.0f, 0.0f, 100.0f} };
-				DrawDebugLine(World, Start, End, FColor::Red, true, -1.0f, 0, 2.0f);
-			}
 		}
 	}
 }
-
 const FVector& ABoard::GetTileLocation(const std::pair<int32, int32>& Coordinates) const
 {
 	if (Coordinates.first < 0 || Coordinates.first >= HEIGHT || Coordinates.second < 0 || Coordinates.second >= WIDTH)
@@ -274,11 +259,9 @@ void ABoard::SetTileColor(const std::pair<int32, int32>& Coordinates, FLinearCol
 	auto TileIt = TileMap.find(Coordinates);
 	if (TileIt == TileMap.end()) return;
 
-	// Get the tile's mesh component
 	UStaticMeshComponent* TileMesh = TileIt->second.MeshComponent;
 	if (!TileMesh) return;
 
-	// Create or get material instance dynamic
 	UMaterialInterface* BaseMaterial = TileMesh->GetMaterial(0);
 	if (!BaseMaterial && DefaultTileMaterial)
 	{
@@ -335,8 +318,7 @@ void ABoard::Interact(APlayerState* Player)
 	if (PlayerPieces.IsEmpty())
 		return;
 
-	FVector Location = GetTileLocation({ 3,3 }) + RootComponent->GetComponentLocation();
-	LogFVector(Location);
+	/* Reference to board should be cached */
 	UBoardManager* BoardManager{ GetWorld()->GetSubsystem<UBoardManager>() };
 	BoardManager->ServerHandleRequest(Player, this);
 }
@@ -377,10 +359,8 @@ bool ABoard::IsViewInterest()
 	return false;
 }
 
-
 /* Currently relies on checking within the PlayersInCollision volume deriving the player states from the player controllers */
 /* functionally makes sense because the player would have to be within the collider volume of the board to be able to interact with it */
-
 
 void cb(AActor* A = nullptr)
 {
