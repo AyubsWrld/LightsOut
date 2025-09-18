@@ -25,15 +25,26 @@ class UBoardManager;
 
 struct FTile
 {
-    UStaticMeshComponent* MeshComponent{};
-    FVector Center{};
-    std::pair<int, int> Coordinates{};
+    using FCartesianCoordinates = std::pair<int32, int32>;
 
-    FTile(UStaticMeshComponent* TileMesh , std::pair<int,int> coords)
+    UStaticMeshComponent*       MeshComponent{}        ;
+    FVector                     Center{}               ;
+    FCartesianCoordinates       Coordinates{}          ;
+
+    FTile(UStaticMeshComponent* TileMesh , FCartesianCoordinates coords)
 		:   MeshComponent(TileMesh),
             Coordinates(coords)
     {}
     FTile() = delete;
+};
+
+struct FPlayerPieceMetadata
+{
+    using FCartesianCoordinates = std::pair<int32, int32>;
+
+    FCartesianCoordinates       Coordinates{}          ;
+    ALightsOutCharacter*        Owner{}                ;
+    FVector                     Location{}             ;
 };
 
 template<>
@@ -43,17 +54,6 @@ struct std::hash<std::pair<int32,int32>>
     {
         return value.first ^ value.second << 10;
     }
-};
-
-
-USTRUCT()
-struct FPlayerPiece
-{
-    GENERATED_BODY()
-
-    UStaticMeshComponent*  Mesh;
-    std::pair<int32,int32> Coordinates;
-
 };
 
 UCLASS()
@@ -91,6 +91,7 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Board", Replicated)
     TArray<UStaticMeshComponent*> PlayerPieces;
+
     UFUNCTION()
     void HandleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
         UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
@@ -138,6 +139,8 @@ public:
     TArray<FTile> Tiles;
 
     std::unordered_map<std::pair<int32, int32>, FTile> TileMap;
+
+    std::unordered_map<UStaticMeshComponent*, FPlayerPieceMetadata> PlayerPiecesMetadata;
     
     bool bQueryIsInterest;
 

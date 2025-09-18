@@ -3,22 +3,24 @@
 
 #include "BoardManager.h"
 
-std::vector<std::pair<std::size_t, std::size_t>> GetValidMoves(
-	const std::pair<std::size_t, std::size_t>& dimensions,
-	const std::pair<std::size_t, std::size_t>& location,
+using TCartesianCoordinates       =        std::pair<std::size_t, std::size_t>;
+using TCoordinatesVector          =        std::vector<std::pair<std::size_t, std::size_t>>;
+
+TCoordinatesVector GetValidMoves(
+	const TCartesianCoordinates& dimensions,
+	const TCartesianCoordinates& location,
 	double dist)
 {
-	std::vector<std::pair<std::size_t, std::size_t>> V;
+	TCoordinatesVector V;
 	for (std::size_t i{}; i < dimensions.first ; i++)
 		for (std::size_t j{}; j < dimensions.second ; j++)
 		{
-			auto dx = static_cast<double>(location.first) - i;
-			auto dy = static_cast<double>(location.second) - j;
+			double dx = static_cast<double>(location.first) - i;
+			double dy = static_cast<double>(location.second) - j;
 			if (std::sqrt(dx * dx + dy * dy) <= dist) V.push_back(std::pair<std::size_t, std::size_t>{i, j});
 		}
 	return V;
 }
-
 void UBoardManager::UpdateBoardState()
 {
 	using enum EBoardState;
@@ -38,7 +40,6 @@ void UBoardManager::OnWorldBeginPlay(UWorld& InWorld)
 	if (InWorld.GetNetMode() != ENetMode::NM_DedicatedServer)
 		return;
 }
-
 
 bool UBoardManager::ShouldCreateSubsystem(UObject* Outer) const 
 {
@@ -85,7 +86,6 @@ void UBoardManager::ServerHandleRequest_Implementation(APlayerState* Player, ABo
 	APlayerController* PC{ GetActivePlayer() };
 
 	if (!World || PC->PlayerState->GetPlayerId() != Player->GetPlayerId() || !Player ) return;
-
 
 	if (GetBoardState() == EBoardState::EBS_AwaitingRoll)
 	{
@@ -160,7 +160,7 @@ void UBoardManager::SetActivePlayer(int32 Index)
 
    @todo:         
 */
-inline void UBoardManager::UpdateCurrentPlayerIndex() 
+void UBoardManager::UpdateCurrentPlayerIndex() 
 {
 	CurrentPlayerIndex = ++CurrentPlayerIndex % PlayerStates.Num();
 	UE_LOG(LogTemp, Warning, TEXT("Current Players Turn: %d"), CurrentPlayerIndex);
@@ -188,10 +188,14 @@ bool UBoardManager::IsPlayersTurn(APlayerState* Player)
 				  BoardManager.
 
    @todo:         Check whether location is valid. and falls within board dimensions. 
+
+   @todo:         Have a better way of translating Location to 3*3 coordinates.
 */
 
 void UBoardManager::MulticastMovePiece_Implementation(FVector Location, ABoard* Board)
 {
+	using          TPieceMap = std::unordered_map<UStaticMeshComponent*, FPlayerPieceMetadata>;
+
 	if (!Board)
 		return;
 
@@ -199,14 +203,38 @@ void UBoardManager::MulticastMovePiece_Implementation(FVector Location, ABoard* 
 	if (!World)
 		return;
 
-	UE_LOG(LogTemp, Warning, TEXT("[%s]: (%f,%f,%f)"), ANSI_TO_TCHAR(__FUNCTION__), Location.X, Location.Y, Location.Z );
-
-	UStaticMeshComponent* Piece{ Board->PlayerPieces[CurrentPlayerIndex] };
+	UStaticMeshComponent*         Piece                  { Board->PlayerPieces[CurrentPlayerIndex] };
 
 	if (!Piece) return;
 
-	Piece->SetWorldLocation(Location);
+	FPlayerPieceMetadata&         PlayerPieceMetadata    { Board->PlayerPiecesMetadata[Piece]   };
+	FVector                       TmpLocation            {};
 
+	for (std::size_t i{}; i < 5; i++)
+	{
+		for (std::size_t j{}; j < 5; j++)
+		{
+			/* Todo cache this once */
+			TmpLocation = Board->GetTileLocation({ i,j }) + Board->GetRootComponent()->GetComponentLocation();
+			if(TmpLocation == Location)
+			{
+				UE_LOG(
+					LogTemp,
+					Warning,
+					TEXT("Found match: (%f,%f,%f) == (%f,%f,%f)"),
+					TmpLocation.X,
+					TmpLocation.Y,
+					TmpLocation.Z,
+					Location.X,
+					Location.Y,
+					Location.Z
+				);
+				PlayerPieceMetadata.Coordinates = { i,j };
+				PlayerPieceMetadata.Location    = Location;
+			}
+		}
+	}
+	Piece->SetWorldLocation(Location);
 }
 
 /*
@@ -224,26 +252,26 @@ void UBoardManager::MulticastMovePiece_Implementation(FVector Location, ABoard* 
 
 void UBoardManager::RenderIndicators(ABoard* Board)
 {
-
 	int32 R1{ FMath::RandRange(1,6) };
 	int32 R2{ FMath::RandRange(1,6) };
-
 	int32 AllowedDistance{ FMath::Abs(R2 - R1) };
 
-	UE_LOG(LogTemp, Warning, TEXT("(%d,%d): %d"), R1, R2, AllowedDistance);
-	std::vector<std::pair<std::size_t, std::size_t>> ValidMoves{
-		GetValidMoves({5u, 5u}, {2,2}, AllowedDistance)
-	};
 
-	FVector VA{};
+	FVector                      ValidMoveLoc      {}                                         ;
+	UStaticMeshComponent*        PlayerPiece       { Board->PlayerPieces[CurrentPlayerIndex] };
+	FPlayerPieceMetadata         PlayerPieceMeta   { Board->PlayerPiecesMetadata[PlayerPiece]};
+
+	
+	TCoordinatesVector ValidMoves{
+		GetValidMoves({5u, 5u}, PlayerPieceMeta.Coordinates , AllowedDistance)
+	};
 
 	for (std::size_t i{}; i < std::size(ValidMoves); i++)
 	{
-		VA = Board->GetTileLocation(std::pair{ static_cast<std::size_t>(ValidMoves[i].first), static_cast<std::size_t>(ValidMoves[i].second) }) + Board->GetRootComponent()->GetComponentLocation();
-		UE_LOG(LogTemp, Warning, TEXT("(%f,%f,%f)"), VA.X, VA.Y, VA.Z);
+		ValidMoveLoc = Board->GetTileLocation(std::pair{ static_cast<std::size_t>(ValidMoves[i].first), static_cast<std::size_t>(ValidMoves[i].second) }) + Board->GetRootComponent()->GetComponentLocation();
 		DrawDebugBox(
 			Board->GetWorld(),
-			VA,
+			ValidMoveLoc	,
 			{ 50.0f, 50.0f, 10.0f },
 			FColor::Green,
 			false,

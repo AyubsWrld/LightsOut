@@ -1,14 +1,15 @@
 ﻿#include "LightsOut/Core/BoardManager.h"
 
 
-/*----------------------------------------------- NM_UTILS ---------------------------------------------*/
+/*----------------------------------------------- UTILS ---------------------------------------------*/
 
 void LogFVector(const FVector& F) 
 {
 	UE_LOG(LogTemp, Warning, TEXT("[%s]: (%f,%f,%f)"), ANSI_TO_TCHAR(__FUNCTION__), F.X, F.Y, F.Z );
 }
 
-/*----------------------------------------------- NM_UTILS ---------------------------------------------*/
+
+/*----------------------------------------------- UTILS ---------------------------------------------*/
 void ABoard::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -162,7 +163,7 @@ void ABoard::CreateGrid()
 
 			// create FTile with reference to the mesh component
 			FTile Tile{ TileMesh, CCoords };
-			Tile.Center = TileLocation; // Set center manually.. make const later and calculate in constructor.
+			Tile.Center = TileLocation;
 
 			// add to collections
 			Tiles.Add(Tile);
@@ -209,6 +210,7 @@ void ABoard::SpawnPlayers()
 			//FPlayerPiece P{ Mesh: PMesh, Coordiantes:  };
 
 			PlayerPieces.Emplace(PMesh);
+			PlayerPiecesMetadata[PMesh] = FPlayerPieceMetadata{ .Coordinates = Tile.Coordinates, .Location = PMesh->GetComponentLocation() };
 
 		}
 	}
@@ -240,6 +242,7 @@ const FVector& ABoard::GetTileLocation(const std::pair<int32, int32>& Coordinate
 		return FVector::ZeroVector;
 	if (decltype(TileMap)::const_iterator it{ TileMap.find(Coordinates) }; it != TileMap.end())
 	{
+		//return it->second.Center + RootComponent->GetComponentLocation();
 		return it->second.Center;
 	}
 	else
@@ -323,7 +326,6 @@ void ABoard::Interact(APlayerState* Player)
 	UBoardManager* BoardManager{ GetWorld()->GetSubsystem<UBoardManager>() };
 	BoardManager->ServerHandleRequest(Player, this);
 }
-
 bool ABoard::IsViewInterest()
 {
 	FHitResult HitResult; 
@@ -359,10 +361,6 @@ bool ABoard::IsViewInterest()
 	}
 	return false;
 }
-
-/* Currently relies on checking within the PlayersInCollision volume deriving the player states from the player controllers */
-/* functionally makes sense because the player would have to be within the collider volume of the board to be able to interact with it */
-
 void cb(AActor* A = nullptr)
 {
 	UE_LOG(LogTemp, Warning, TEXT("[%s]: Invocable stub called"), ANSI_TO_TCHAR(__FUNCTION__));
