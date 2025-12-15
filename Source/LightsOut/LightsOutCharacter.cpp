@@ -8,6 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Kismet/GameplayStatics.h"
 #include "Engine/LocalPlayer.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -76,12 +77,17 @@ void ALightsOutCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		// Interctions
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ALightsOutCharacter::Interact);
 
-		// Equip Items 
+		// Currently equipping items has been swapped out for level streaming testing. 
 
 		EnhancedInputComponent->BindAction(EquipSlotZeroAction, ETriggerEvent::Triggered, this, &ALightsOutCharacter::EquipSlot0);
+
+		/* Removed item equipping for now as it is not needed. ( when putting them back remove magic numbers for unscoped/unnamed enumerations 
+		
 		EnhancedInputComponent->BindAction(EquipSlotOneAction, ETriggerEvent::Triggered, this, &ALightsOutCharacter::EquipSlot1);
 		EnhancedInputComponent->BindAction(EquipSlotTwoAction, ETriggerEvent::Triggered, this, &ALightsOutCharacter::EquipSlot2);
 		EnhancedInputComponent->BindAction(EquipSlotThreeAction, ETriggerEvent::Triggered, this, &ALightsOutCharacter::EquipSlot3);
+
+		*/
 	}
 	else
 	{
@@ -160,14 +166,8 @@ void ALightsOutCharacter::Interact(const FInputActionValue& Value)
 void ALightsOutCharacter::EquipSlot0(const FInputActionValue& Value)
 {
 	/* ... Server Validation RPC ... */
-	check(PlayerHUD);
-	if (!PlayerHUD || !PlayerInventory )
-		return; 
-	Cast<ULightsOutCharacterHUD>(PlayerHUD)->DebugItemSlot(0);
-	if (ItemBroker)
-	{
-		ServerHandleEquipRequest(PlayerInventory->GetItemAtIndex(0));
-	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Attempted to equip slot (0)"));
 }
 
 void ALightsOutCharacter::EquipSlot1(const FInputActionValue& Value)
