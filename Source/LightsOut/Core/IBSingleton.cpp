@@ -16,7 +16,7 @@ void UIBSingleton::OnWorldBeginPlay(UWorld& InWorld)
 {
 	if (InWorld.GetNetMode() == ENetMode::NM_Client)
 		return;
-	MulticastSpawnItems(&InWorld);
+	//MulticastSpawnItems(&InWorld);
 }
 
 bool UIBSingleton::TryAddToPlayerInventory(AItemBase& Item, PID PlayerID)

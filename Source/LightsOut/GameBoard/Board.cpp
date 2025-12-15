@@ -1,4 +1,5 @@
-﻿#include "LightsOut/Core/BoardManager.h"
+﻿#include "Board.h"
+#include "LightsOut/Core/BoardManager.h"
 
 
 /*----------------------------------------------- UTILS ---------------------------------------------*/
