@@ -8,6 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "LightsOut/Core/MinigameManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/LocalPlayer.h"
 
@@ -166,8 +167,16 @@ void ALightsOutCharacter::Interact(const FInputActionValue& Value)
 void ALightsOutCharacter::EquipSlot0(const FInputActionValue& Value)
 {
 	/* ... Server Validation RPC ... */
-
-	UE_LOG(LogTemp, Warning, TEXT("Attempted to equip slot (0)"));
+	UE_LOG(LogTemp, Warning, TEXT("Attempting to swap map"));
+	if (UMinigameManager* MinigameManager = GetWorld()->GetSubsystem<UMinigameManager>(); MinigameManager)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Found MinigameManager"));
+		MinigameManager->ChangeMinigame(); 
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to get minigame manager"));
+	}
 }
 
 void ALightsOutCharacter::EquipSlot1(const FInputActionValue& Value)
@@ -228,6 +237,7 @@ void ALightsOutCharacter::BeginPlay()
 	// Initialize Camera hit scanner
 
 
+	/* This is disgusting really, just use delegates */
 	ItemBroker = GetWorld()->GetSubsystem<UIBSingleton>();
 	PrimaryActorTick.bCanEverTick = true;
 	CameraScanner = MakeUnique<FCameraHitScanner>(FirstPersonCameraComponent, GetWorld(), this);
