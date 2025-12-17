@@ -39,10 +39,10 @@ class LIGHTSOUT_API AHideAndSeekGameMode : public AGameModeBase
 	 * @warning: this is called before actors' PreInitializeComponents.
 	 * @warning: Overriding without calling Super() causes exception violations. See implementation. 
 	 */
-
-	ENGINE_API virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
-	ENGINE_API virtual void StartPlay() override;
-	ENGINE_API virtual bool HasMatchStarted() const override;
+	AHideAndSeekGameMode(const FObjectInitializer& ObjectInitializer);
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+	virtual void StartPlay() override;
+	virtual bool HasMatchStarted() const override;
 	//virtual APlayerController* Login(UPlayer* NewPlayer, ENetRole InRemoteRole, const FString& Portal, const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage);
 	
 };

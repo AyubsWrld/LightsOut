@@ -31,7 +31,7 @@ void UMinigameManager::OnWorldBeginPlay(UWorld& InWorld)
 	GetWorld()->GetTimerManager().SetTimer(
 		MinigameTimerHandle,
 		this,
-		&UMinigameManager::TestTimerDelegate,
+		&UMinigameManager::ChangeMinigame,
 		10.0f,
 		false 
 	);
@@ -43,7 +43,7 @@ void UMinigameManager::ChangeMinigame()
 {
 	UE_LOG(LogTemp, Warning, TEXT("[UMinigameManager]: ChangeMinigame"));
 	GetWorld()->ServerTravel(
-		"TestTransition",
+		"HideAndSeek",
 		false,
 		false
 		);

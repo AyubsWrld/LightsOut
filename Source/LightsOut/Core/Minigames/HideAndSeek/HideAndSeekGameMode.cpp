@@ -4,10 +4,31 @@
 #include "Lightsout/Core/Minigames/HideAndSeek/HideAndSeekGameMode.h"
 
 
+AHideAndSeekGameMode::AHideAndSeekGameMode(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+	UE_LOG(LogTemp, Warning, TEXT("[%s]: Delegated call to Super::ctor(const FObjectInitializer&), game has started: %d"), ANSI_TO_TCHAR(__FUNCTION__), HasMatchStarted());
+	
+	// This should be globally set. 
+	// bDelayedStart = false; 
+
+	/*
+	// One-time initialization
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.TickGroup = TG_PrePhysics;
+	MatchState = MatchState::EnteringMap;
+	EngineMessageClass = UEngineMessage::StaticClass();
+	GameStateClass = AGameState::StaticClass();
+	MinRespawnDelay = 1.0f;
+	InactivePlayerStateLifeSpan = 300.f;
+	MaxInactivePlayers = 16;
+	*/
+}
+
 void AHideAndSeekGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
-	Super::InitGame(MapName, Options, ErrorMessage);
 	UE_LOG(LogTemp, Warning, TEXT("[%s]: Delegated call to Super::InitGame(FString, FString, FString)"), ANSI_TO_TCHAR(__FUNCTION__));
+	Super::InitGame(MapName, Options, ErrorMessage);
 }
 
 void AHideAndSeekGameMode::StartPlay() 
