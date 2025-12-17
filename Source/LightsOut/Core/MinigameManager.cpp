@@ -4,44 +4,6 @@
 #include "GameFramework/GameStateBase.h"
 
 
-enum class EWinCondition
-{
-	WC_UNDEFINED,
-	WC_TimeBased,
-	WC_EliminationBased,
-	WC_PuzzleBased,
-	WC_MAX
-};
-
-enum class EMinigameDifficulty
-{
-	MGD_UNDEFINED,
-	MGD_Easy,
-	MGD_Medium,
-	MGD_Hard,
-	MGD_Insane,
-};
-
-struct FMinigame
-{
-	AGameModeBase*		GameMode;
-	FName				LevelIdentifier;
-	EWinCondition		WinCondition;
-	EMinigameDifficulty Difficulty;
-	
-	FMinigame()		=	default;
-	~FMinigame()	=	default;
-	
-	FMinigame(const FMinigame& InMinigame) = delete;
-	FMinigame(const FMinigame&& InMinigame) = delete;
-	
-	FMinigame& operator=(const FMinigame& InMinigame) noexcept	=	delete;
-	FMinigame& operator=(FMinigame&& InMinigame) noexcept		=	delete;
-	
-	void BeginMinigame();
-	void EndMinigame();
-};
-
 bool UMinigameManager::ShouldCreateSubsystem(UObject* Outer) const 
 {
 	const UWorld* World = Cast<UWorld>(Outer);
@@ -57,20 +19,21 @@ void UMinigameManager::OnWorldBeginPlay(UWorld& InWorld)
 		return;
 		
 	UE_LOG(LogTemp, Warning, TEXT("[UMinigameManager]: BeginPlay Called"));
-	
+
+	/*
 	if (const AGameStateBase* GameState = GetWorld()->GetGameState(); GameState)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("[UMinigameManager]: Found GameState"));
 		UE_LOG(LogTemp, Warning, TEXT("[UMinigameManager]: Number Players: %lu"), GameState->PlayerArray.Num());
 	}
+	*/
 	
-	// Start 10 second timer
 	GetWorld()->GetTimerManager().SetTimer(
 		MinigameTimerHandle,
 		this,
-		&UMinigameManager::ChangeMinigame,
+		&UMinigameManager::TestTimerDelegate,
 		10.0f,
-		false // Don't loop
+		false 
 	);
 	
 	UE_LOG(LogTemp, Warning, TEXT("[UMinigameManager]: Timer set for 10 seconds"));
@@ -85,6 +48,16 @@ void UMinigameManager::ChangeMinigame()
 		false
 		);
 	return;
+}
+
+void UMinigameManager::TestTimerDelegate() const 
+{
+	UE_LOG(LogTemp, Warning, TEXT("[UMinigameManager]: TestTimerDelegate Invoked"));
+	if ( UWorld* World{ GetWorld() } ; World )
+	{
+		const auto GameState = World->GetGameState(); 
+		UE_LOG(LogTemp, Log, TEXT("Currently running for: %f"), GameState->CreationTime);
+	}
 }
 
 void UMinigameManager::BeginMinigame(FMinigame& InMinigame)

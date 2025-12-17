@@ -3,15 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameModeBase.h"
-#include "MinigameBase.generated.h"
+#include "GameFramework/GameStateBase.h"
+#include "HideAndSeekGameState.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class LIGHTSOUT_API AMinigameBase : public AGameModeBase
+class LIGHTSOUT_API AHideAndSeekGameState : public AGameStateBase
 {
 	GENERATED_BODY()
-	void LogValues();
 };
