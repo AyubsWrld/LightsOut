@@ -39,10 +39,33 @@ class LIGHTSOUT_API AHideAndSeekGameMode : public AGameModeBase
 	 * @warning: this is called before actors' PreInitializeComponents.
 	 * @warning: Overriding without calling Super() causes exception violations. See implementation. 
 	 */
+
+	/* AGameModeBase Interface */ 
 	AHideAndSeekGameMode(const FObjectInitializer& ObjectInitializer);
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	virtual void StartPlay() override;
 	virtual bool HasMatchStarted() const override;
-	//virtual APlayerController* Login(UPlayer* NewPlayer, ENetRole InRemoteRole, const FString& Portal, const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage);
+	virtual bool HasMatchEnded() const override;
+
+	/*
+	   @purpose:		Simple function to begin the timer for the players to hide, Updates associated 
+						AGameState.
+										   return
 	
+	   @code:         S_OK                    Partition was created successfully. 
+	
+	   @notes:        This function delegates platform logic and does not itself implement
+					  partition logic directly.
+	
+	*/	
+	
+	void BeginTimer();
+	void InvokeCallback();
+	
+public:
+	
+	DECLARE_DELEGATE(FMinigameEndDelegate);
+	FMinigameEndDelegate EndDelegate;
+
+	FMinigameEndDelegate& GetEndDelegate() { return EndDelegate; };
 };

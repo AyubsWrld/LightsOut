@@ -1,8 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "MinigameManager.h"
-#include "GameFramework/GameStateBase.h"
-
 
 bool UMinigameManager::ShouldCreateSubsystem(UObject* Outer) const 
 {
@@ -13,30 +11,30 @@ bool UMinigameManager::ShouldCreateSubsystem(UObject* Outer) const
 	return (NetMode == NM_DedicatedServer || NetMode == NM_ListenServer);
 }
 
+/* This is called everytime a new level is loaded in */
 void UMinigameManager::OnWorldBeginPlay(UWorld& InWorld)
 {
+	UE_LOG(LogTemp, Warning, TEXT("[UMinigameManager]: OnWorldBeginPlay Invoked"));
+	UE_LOG(LogTemp, Warning, TEXT("[UMinigameManager]: World UUID: %d"), InWorld.GetUniqueID());
+
+	/* Change this to an interface */
+	if ( AHideAndSeekGameMode* GameModeReference{ Cast<AHideAndSeekGameMode>(GetWorld()->GetAuthGameMode())}  ; GameModeReference )
+	{
+		AHideAndSeekGameMode::FMinigameEndDelegate& DelegateHandle{GameModeReference->GetEndDelegate()};
+		DelegateHandle.BindLambda([]() -> void { UE_LOG(LogTemp, Error, TEXT("[%s]: Callback invoked"), ANSI_TO_TCHAR(__FUNCTION__));});
+		GetWorld()->GetTimerManager().SetTimer(
+			MinigameTimerHandle,
+			[&](){ ChangeMinigame(); },
+			10.0f,
+			false
+			);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Could not reference the correct game mode"));
+	}
 	if (InWorld.GetNetMode() == ENetMode::NM_Client)
 		return;
-		
-	UE_LOG(LogTemp, Warning, TEXT("[UMinigameManager]: BeginPlay Called"));
-
-	/*
-	if (const AGameStateBase* GameState = GetWorld()->GetGameState(); GameState)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("[UMinigameManager]: Found GameState"));
-		UE_LOG(LogTemp, Warning, TEXT("[UMinigameManager]: Number Players: %lu"), GameState->PlayerArray.Num());
-	}
-	*/
-	
-	GetWorld()->GetTimerManager().SetTimer(
-		MinigameTimerHandle,
-		this,
-		&UMinigameManager::ChangeMinigame,
-		10.0f,
-		false 
-	);
-	
-	UE_LOG(LogTemp, Warning, TEXT("[UMinigameManager]: Timer set for 10 seconds"));
 }
 
 void UMinigameManager::ChangeMinigame()
@@ -56,7 +54,7 @@ void UMinigameManager::TestTimerDelegate() const
 	if ( UWorld* World{ GetWorld() } ; World )
 	{
 		const auto GameState = World->GetGameState(); 
-		UE_LOG(LogTemp, Log, TEXT("Currently running for: %f"), GameState->CreationTime);
+		//UE_LOG(LogTemp, Log, TEXT("Currently running for: %f"));
 	}
 }
 
@@ -70,5 +68,13 @@ void UMinigameManager::BeginMinigame(FMinigame& InMinigame)
 void UMinigameManager::OnMinigameEnd(FMinigame& InMinigame)
 {
 	UE_LOG(LogTemp, Warning, TEXT("[UMinigameManager]: ChangeMinigame"));
+	GetWorld()->GetTimerManager().SetTimer(
+		MinigameTimerHandle,
+		this,
+		&UMinigameManager::ChangeMinigame,
+		10.0f,
+		false
+	);
+	
 	return;
 }

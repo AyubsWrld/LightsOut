@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "GameMapsSettings.h"
+#include "LightsOut/Core/Minigames/HideAndSeek/HideAndSeekGameMode.h"
 #include "MinigameManager.generated.h"
 
 /**
