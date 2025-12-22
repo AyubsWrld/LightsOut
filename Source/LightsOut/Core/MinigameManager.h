@@ -5,52 +5,36 @@
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "GameMapsSettings.h"
-#include "LightsOut/Core/Minigames/HideAndSeek/HideAndSeekGameMode.h"
+#include "LightsOut/Core/Minigames/Containers/TMinigame.h"
 #include "MinigameManager.generated.h"
 
 /**
  * 
  */
 
-enum class EWinCondition
+namespace LO
 {
-	WC_UNDEFINED,
-	WC_TimeBased,
-	WC_EliminationBased,
-	WC_PuzzleBased,
-	WC_MAX
-};
-
-enum class EMinigameDifficulty
-{
-	MGD_UNDEFINED,
-	MGD_Easy,
-	MGD_Medium,
-	MGD_Hard,
-	MGD_Insane,
-};
-
-struct FMinigame
-{
-
-	AGameModeBase*		GameMode;
-	FName				LevelIdentifier;
-	EWinCondition		WinCondition;
-	EMinigameDifficulty Difficulty;
+	struct FMinigame
+	{
+		AGameModeBase*		GameMode;
+		FName				LevelIdentifier;
+		EWinCondition		WinCondition;
+		EMinigameDifficulty Difficulty;
 	
-	FMinigame()		=	default;
-	~FMinigame()	=	default;
+		FMinigame()		=	default;
+		~FMinigame()	=	default;
 	
-	FMinigame(const FMinigame& InMinigame) = delete;
-	FMinigame(const FMinigame&& InMinigame) = delete;
+		FMinigame(const FMinigame& InMinigame) = delete;
+		FMinigame(const FMinigame&& InMinigame) = delete;
 	
-	FMinigame& operator=(const FMinigame& InMinigame) noexcept	=	delete;
-	FMinigame& operator=(FMinigame&& InMinigame) noexcept		=	delete;
+		FMinigame& operator=(const FMinigame& InMinigame) noexcept	=	delete;
+		FMinigame& operator=(FMinigame&& InMinigame) noexcept		=	delete;
 	
-	void BeginMinigame();
-	void EndMinigame();
+		void BeginMinigame();
+		void EndMinigame();
 	
-};
+	};
+}
 
 UCLASS()
 class LIGHTSOUT_API UMinigameManager : public UWorldSubsystem
@@ -65,11 +49,11 @@ private:
 	
 	virtual bool ShouldCreateSubsystem(UObject* Outer) const override; 
 	
-	virtual void OnWorldBeginPlay(UWorld& InWorld) ; 
+	virtual void OnWorldBeginPlay(UWorld& InWorld) override; 
 	
-	void BeginMinigame(FMinigame& InMinigame);
+	void BeginMinigame(LO::FMinigame& InMinigame);
 	
-	void OnMinigameEnd(FMinigame& InMinigame);
+	void OnMinigameEnd(LO::FMinigame& InMinigame);
 	
 	void TestTimerDelegate() const;
 	

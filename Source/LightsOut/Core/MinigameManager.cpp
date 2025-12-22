@@ -17,17 +17,11 @@ void UMinigameManager::OnWorldBeginPlay(UWorld& InWorld)
 	UE_LOG(LogTemp, Warning, TEXT("[UMinigameManager]: OnWorldBeginPlay Invoked"));
 	UE_LOG(LogTemp, Warning, TEXT("[UMinigameManager]: World UUID: %d"), InWorld.GetUniqueID());
 
-	/* Change this to an interface */
-	if ( AHideAndSeekGameMode* GameModeReference{ Cast<AHideAndSeekGameMode>(GetWorld()->GetAuthGameMode())}  ; GameModeReference )
+	if ( TWeakObjectPtr<LO::TMinigame> GameModeReference{ Cast<LO::TMinigame>(GetWorld()->GetAuthGameMode())}  ; GameModeReference.Get() )
 	{
-		AHideAndSeekGameMode::FMinigameEndDelegate& DelegateHandle{GameModeReference->GetEndDelegate()};
-		DelegateHandle.BindLambda([]() -> void { UE_LOG(LogTemp, Error, TEXT("[%s]: Callback invoked"), ANSI_TO_TCHAR(__FUNCTION__));});
-		GetWorld()->GetTimerManager().SetTimer(
-			MinigameTimerHandle,
-			[&](){ ChangeMinigame(); },
-			10.0f,
-			false
-			);
+		UE_LOG(LogTemp, Error, TEXT("[%s]: Bound Delegate"), ANSI_TO_TCHAR(__FUNCTION__));
+		LO::TEndMinigameDelegate& DelegateHandle{GameModeReference->GetEndMinigameDelegate()};
+		DelegateHandle.BindLambda([this]() -> void {  ChangeMinigame(); });
 	}
 	else
 	{
@@ -58,23 +52,14 @@ void UMinigameManager::TestTimerDelegate() const
 	}
 }
 
-void UMinigameManager::BeginMinigame(FMinigame& InMinigame)
+void UMinigameManager::BeginMinigame(LO::FMinigame& InMinigame)
 {
 	check(!bInMinigame && "Invalid state, called when minigame is currently in session")
 	bInMinigame = true;
 	return;
 }
 
-void UMinigameManager::OnMinigameEnd(FMinigame& InMinigame)
+void UMinigameManager::OnMinigameEnd(LO::FMinigame& InMinigame)
 {
-	UE_LOG(LogTemp, Warning, TEXT("[UMinigameManager]: ChangeMinigame"));
-	GetWorld()->GetTimerManager().SetTimer(
-		MinigameTimerHandle,
-		this,
-		&UMinigameManager::ChangeMinigame,
-		10.0f,
-		false
-	);
-	
 	return;
 }

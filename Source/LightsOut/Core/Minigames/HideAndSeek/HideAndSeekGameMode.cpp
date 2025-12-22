@@ -63,25 +63,14 @@ void AHideAndSeekGameMode::BeginTimer()
 		this,
 		&AHideAndSeekGameMode::InvokeCallback,
 		40.0f,
-		false,
 		false
 		);
-
-	/* Invoked imemdiately
-	 
-	GetWorld()->GetTimerManager().SetTimer(
-		TimerHandle,
-		[&](){ EndDelegate.ExecuteIfBound(); },
-		40.0f,
-		false,
-		false
-		);
-	*/
 }
 
 void AHideAndSeekGameMode::InvokeCallback() 
 {
+	UE_LOG(LogTemp, Error , TEXT("[%s]: Invoking Callback"), ANSI_TO_TCHAR(__FUNCTION__));
 	EndDelegate.ExecuteIfBound(); 
 }
 
-
+publci publci 

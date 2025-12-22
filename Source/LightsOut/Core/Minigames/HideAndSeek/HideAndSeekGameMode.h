@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "LightsOut/Core/Minigames/Containers/TMinigame.h"
 #include "HideAndSeekGameMode.generated.h"
 
 /**
@@ -32,6 +33,9 @@ class LIGHTSOUT_API AHideAndSeekGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
+	LO::TEndMinigameDelegate	EndDelegate		;
+	LO::TStartMinigameDelegate	StartDelegate	;
+	
 	/**
 	 * Initialize the game.
 	 * The GameMode's InitGame() event is called before any other functions (including PreInitializeComponents() )
@@ -64,8 +68,7 @@ class LIGHTSOUT_API AHideAndSeekGameMode : public AGameModeBase
 	
 public:
 	
-	DECLARE_DELEGATE(FMinigameEndDelegate);
-	FMinigameEndDelegate EndDelegate;
-
-	FMinigameEndDelegate& GetEndDelegate() { return EndDelegate; };
+	LO::TEndMinigameDelegate&	GetEndMinigameDelegate()	{ return EndDelegate;   }
+	LO::TStartMinigameDelegate& GetStartMinigameDelegate()	{ return StartDelegate; }
+	
 };
