@@ -11,24 +11,13 @@ bool UMinigameManager::ShouldCreateSubsystem(UObject* Outer) const
 	return (NetMode == NM_DedicatedServer || NetMode == NM_ListenServer);
 }
 
-/* This is called everytime a new level is loaded in */
 void UMinigameManager::OnWorldBeginPlay(UWorld& InWorld)
-{
-	UE_LOG(LogTemp, Warning, TEXT("[UMinigameManager]: OnWorldBeginPlay Invoked"));
-	UE_LOG(LogTemp, Warning, TEXT("[UMinigameManager]: World UUID: %d"), InWorld.GetUniqueID());
-
-	if ( TWeakObjectPtr<LO::TMinigame> GameModeReference{ Cast<LO::TMinigame>(GetWorld()->GetAuthGameMode())}  ; GameModeReference.Get() )
-	{
-		UE_LOG(LogTemp, Error, TEXT("[%s]: Bound Delegate"), ANSI_TO_TCHAR(__FUNCTION__));
-		LO::TEndMinigameDelegate& DelegateHandle{GameModeReference->GetEndMinigameDelegate()};
-		DelegateHandle.BindLambda([this]() -> void {  ChangeMinigame(); });
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Could not reference the correct game mode"));
-	}
+{ 
+	/* Do we want to set up something for the client or not? */ 
 	if (InWorld.GetNetMode() == ENetMode::NM_Client)
 		return;
+	Super::OnWorldBeginPlay(InWorld);
+	BindGameModeDelegates();
 }
 
 void UMinigameManager::ChangeMinigame()
@@ -42,24 +31,24 @@ void UMinigameManager::ChangeMinigame()
 	return;
 }
 
-void UMinigameManager::TestTimerDelegate() const 
+void UMinigameManager::BeginMinigame(LOUT::FMinigame& InMinigame)
 {
-	UE_LOG(LogTemp, Warning, TEXT("[UMinigameManager]: TestTimerDelegate Invoked"));
-	if ( UWorld* World{ GetWorld() } ; World )
-	{
-		const auto GameState = World->GetGameState(); 
-		//UE_LOG(LogTemp, Log, TEXT("Currently running for: %f"));
-	}
-}
-
-void UMinigameManager::BeginMinigame(LO::FMinigame& InMinigame)
-{
-	check(!bInMinigame && "Invalid state, called when minigame is currently in session")
 	bInMinigame = true;
 	return;
 }
 
-void UMinigameManager::OnMinigameEnd(LO::FMinigame& InMinigame)
+void UMinigameManager::OnMinigameEnd(LOUT::FMinigame& InMinigame)
 {
 	return;
+}
+
+void UMinigameManager::BindGameModeDelegates()
+{
+	if (InClientContext())
+		return;
+	if (AHideAndSeekGameMode* GameModeReference{ Cast<AHideAndSeekGameMode>(GetWorld()->GetAuthGameMode())} ; GameModeReference )
+	{
+		auto& MinigameEndDelegate{ GameModeReference->GetEndMinigameDelegate() } ;
+		MinigameEndDelegate.BindLambda([this](){ChangeMinigame();});
+	}
 }

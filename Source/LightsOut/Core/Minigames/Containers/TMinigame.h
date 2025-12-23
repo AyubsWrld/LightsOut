@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
+#include "GameFramework/GameModeBase.h"
 /**
  * 
  */
@@ -11,9 +11,8 @@
 /* What is the purpose of forwarding the reference? */
 /* Would it make sense to just utilize header only functions? */ 
 
-namespace LO
+namespace LOUT
 {
-	
 	enum class EWinCondition
 	{
 		WC_UNDEFINED,
@@ -40,9 +39,9 @@ namespace LO
 	using TEndMinigameDelegate		=	FEndMingameDelegate;
 	using TStartMinigameDelegate	=	FEndMingameDelegate;
 	
-	class LIGHTSOUT_API TMinigame : public UObject
+	class LIGHTSOUT_API TMinigame  : public AGameModeBase
 	{ 
-		struct IMinigameConcept
+		struct IMinigameConcept 
 		{
 			virtual		~IMinigameConcept() = default; 
 			virtual		TEndMinigameDelegate&	GetEndMinigameDelegate()	= 0;
@@ -66,14 +65,14 @@ namespace LO
 		
 		template<typename T>
 		TMinigame(T&& Minigame)
-			: minigame_pointer_(TWeakObjectPtr<T>(Forward<T>(Minigame)))
+			: MinigamePointer(&Minigame)
 		{}
 		
 		TEndMinigameDelegate&		GetEndMinigameDelegate();
 		TStartMinigameDelegate&		GetStartMinigameDelegate();
 		
 	private:
-		TWeakObjectPtr<IMinigameConcept> minigame_pointer_;
+		IMinigameConcept* MinigamePointer;
 	};
 	
 }

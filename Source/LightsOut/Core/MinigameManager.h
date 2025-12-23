@@ -5,14 +5,15 @@
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "GameMapsSettings.h"
-#include "LightsOut/Core/Minigames/Containers/TMinigame.h"
+//#include "LightsOut/Core/Minigames/Containers/TMinigame.h"
+#include "LightsOut/Core/Minigames/HideAndSeek/HideAndSeekGameMode.h"
 #include "MinigameManager.generated.h"
 
 /**
  * 
  */
 
-namespace LO
+namespace LOUT
 {
 	struct FMinigame
 	{
@@ -51,17 +52,18 @@ private:
 	
 	virtual void OnWorldBeginPlay(UWorld& InWorld) override; 
 	
-	void BeginMinigame(LO::FMinigame& InMinigame);
+	void	BeginMinigame(LOUT::FMinigame& InMinigame);
 	
-	void OnMinigameEnd(LO::FMinigame& InMinigame);
+	void	OnMinigameEnd(LOUT::FMinigame& InMinigame);
 	
-	void TestTimerDelegate() const;
-	
-	
-public:
+	void	BindGameModeDelegates(); 
+
+	bool	InClientContext() const  { return ( GetWorld()->GetNetMode() == NM_Client); };
 	
 	void ChangeMinigame();
 	
-	inline bool IsCurrentlyInMinigame() const { return bInMinigame; }
+public:
+	
+	inline bool InMinigame() const { return bInMinigame; }
 	
 };

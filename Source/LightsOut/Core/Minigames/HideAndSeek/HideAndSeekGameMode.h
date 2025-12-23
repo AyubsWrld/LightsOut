@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameModeBase.h"
 #include "LightsOut/Core/Minigames/Containers/TMinigame.h"
 #include "HideAndSeekGameMode.generated.h"
 
@@ -33,8 +32,8 @@ class LIGHTSOUT_API AHideAndSeekGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
-	LO::TEndMinigameDelegate	EndDelegate		;
-	LO::TStartMinigameDelegate	StartDelegate	;
+	LOUT::TEndMinigameDelegate	EndDelegate		;
+	LOUT::TStartMinigameDelegate	StartDelegate	;
 	
 	/**
 	 * Initialize the game.
@@ -63,12 +62,10 @@ class LIGHTSOUT_API AHideAndSeekGameMode : public AGameModeBase
 	
 	*/	
 	
-	void BeginTimer();
-	void InvokeCallback();
-	
 public:
-	
-	LO::TEndMinigameDelegate&	GetEndMinigameDelegate()	{ return EndDelegate;   }
-	LO::TStartMinigameDelegate& GetStartMinigameDelegate()	{ return StartDelegate; }
+
+	void Invoke(); 
+	LOUT::TEndMinigameDelegate&		GetEndMinigameDelegate()	{ return EndDelegate;   }
+	LOUT::TStartMinigameDelegate&	GetStartMinigameDelegate()	{ return StartDelegate; }
 	
 };

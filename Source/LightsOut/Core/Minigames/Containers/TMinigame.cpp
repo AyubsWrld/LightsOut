@@ -3,7 +3,7 @@
 
 #include "LightsOut/Core/Minigames/Containers/TMinigame.h"
 
-namespace LO
+namespace LOUT
 {
 	
 	constexpr EWinCondition operator|(EWinCondition Lhs, EWinCondition Rhs)
@@ -26,12 +26,16 @@ namespace LO
 	
 	TEndMinigameDelegate& TMinigame::GetEndMinigameDelegate()
 	{
-		return minigame_pointer_->GetEndMinigameDelegate();
+		UE_LOG(LogTemp, Warning, TEXT("%p"), MinigamePointer);
+		check(MinigamePointer && "Could not retrieve pointer to minigame");
+		return MinigamePointer->GetEndMinigameDelegate();
 	}
 	
 	TStartMinigameDelegate&	TMinigame::GetStartMinigameDelegate()
 	{
-		return minigame_pointer_->GetStartMinigameDelegate();
+		UE_LOG(LogTemp, Warning, TEXT("%p"), MinigamePointer);
+		check(!MinigamePointer && "Could not retrieve pointer to minigame");
+		return MinigamePointer->GetStartMinigameDelegate();
 	}
 	
 }
