@@ -48,7 +48,10 @@ void UMinigameManager::BindGameModeDelegates()
 		return;
 	if (AHideAndSeekGameMode* GameModeReference{ Cast<AHideAndSeekGameMode>(GetWorld()->GetAuthGameMode())} ; GameModeReference )
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Bound Delegates"))
 		auto& MinigameEndDelegate{ GameModeReference->GetEndMinigameDelegate() } ;
 		MinigameEndDelegate.BindLambda([this](){ChangeMinigame();});
+		return; 
 	}
+	UE_LOG(LogTemp, Error, TEXT("Failed to Bind Delegates"))
 }

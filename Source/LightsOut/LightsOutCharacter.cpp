@@ -166,17 +166,6 @@ void ALightsOutCharacter::Interact(const FInputActionValue& Value)
 
 void ALightsOutCharacter::EquipSlot0(const FInputActionValue& Value)
 {
-	/* ... Server Validation RPC ... */
-	UE_LOG(LogTemp, Warning, TEXT("Attempting to swap map"));
-	if (UMinigameManager* MinigameManager = GetWorld()->GetSubsystem<UMinigameManager>(); MinigameManager)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Found MinigameManager"));
-		MinigameManager->ChangeMinigame(); 
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed to get minigame manager"));
-	}
 }
 
 void ALightsOutCharacter::EquipSlot1(const FInputActionValue& Value)
