@@ -54,7 +54,10 @@ class LIGHTSOUT_API UInteractionManager : public UWorldSubsystem
 	
 	GENERATED_BODY()
 	
+	FEventDelegate InteractionEventDelegate; 
+	
 public: 
+
 	
 	// USubsystem implementation Begin
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
@@ -69,5 +72,9 @@ public:
 
 	/* Handler */ 
 	void ConsumeEvent(const FInteractionEvent& InteractionEvent) const;
+	
+	void BindEvent(FEventDelegate Delegate);
+	
+	FEventDelegate& GetEventDelegateHandle() { return InteractionEventDelegate; }
 	
 };

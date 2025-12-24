@@ -25,6 +25,8 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	void OnInteractionEvent(FInteractionEvent InteractionEvent);
+	
 	FInteractionEvent GetStubEvent() const ;
 		
 };

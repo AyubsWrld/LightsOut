@@ -70,4 +70,6 @@ void UInteractionManager::ConsumeEvent(const FInteractionEvent& InteractionEvent
 	}
 	return; 
 }
+
+void UInteractionManager::BindEvent(FEventDelegate Delegate) { return; }
 	
