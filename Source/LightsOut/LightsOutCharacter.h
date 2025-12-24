@@ -10,6 +10,7 @@
 #include "Generics/ItemBroker.h"
 #include "Core/IBSingleton.h"
 #include "LightsOut/UI/HUD/LightsOutCharacterHUD.h"
+#include "LightsOut/Core/InteractionSystem/InteractorComponent.h"
 #include "LightsOut/PlayerComponents/Inventory.h"
 #include "LightsOutCharacter.generated.h"
 
@@ -71,7 +72,9 @@ class ALightsOutCharacter : public ACharacter
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Mesh, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Mesh1P;
-
+	
+	UInteractorComponent* InteractorComponent;  // Maybe Swap out for non-raw pointers 
+	
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCameraComponent;

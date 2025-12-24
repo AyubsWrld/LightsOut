@@ -19,17 +19,13 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 ALightsOutCharacter::ALightsOutCharacter()
 {
-	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
 
-	// Create a CameraComponent	
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
-
-	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
 	Mesh1P->SetOnlyOwnerSee(false);
 	Mesh1P->SetupAttachment(FirstPersonCameraComponent);
@@ -37,11 +33,10 @@ ALightsOutCharacter::ALightsOutCharacter()
 	Mesh1P->CastShadow = false;
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
-	// Bind reference to global itembroker instance 
-
-	//ItemBroker = MakeShared<IItemBroker>(GetWorld()->GetSubsystem<UIBSingleton>());
-
-
+	/* Bind Actor Components */
+	
+	InteractorComponent = CreateDefaultSubobject<UInteractorComponent>(TEXT("InteractorComponent"));
+	
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
@@ -227,9 +222,10 @@ void ALightsOutCharacter::BeginPlay()
 
 
 	/* This is disgusting really, just use delegates */
-	ItemBroker = GetWorld()->GetSubsystem<UIBSingleton>();
 	PrimaryActorTick.bCanEverTick = true;
-	CameraScanner = MakeUnique<FCameraHitScanner>(FirstPersonCameraComponent, GetWorld(), this);
+	
+	ItemBroker				=	GetWorld()->GetSubsystem<UIBSingleton>();
+	CameraScanner			=	MakeUnique<FCameraHitScanner>(FirstPersonCameraComponent, GetWorld(), this);
 
 	/* Hud Logic
 	if (IsLocallyControlled() && Controller)
