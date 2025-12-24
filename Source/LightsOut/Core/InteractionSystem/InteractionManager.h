@@ -10,6 +10,9 @@
  * 
  */
 
+/* Move these into their own struct Header */ 
+
+
 enum class EInteractionEventTag
 {
 	IE_Undefined,
@@ -17,6 +20,33 @@ enum class EInteractionEventTag
 	IE_ItemInteraction,
 	IE_Max,
 };
+
+/* How does this interact when the move constructor is called? */ 
+/* Figure out the copy */ 
+
+struct FInteractionEvent
+{
+	TWeakObjectPtr<UObject>		Interactable{}; 
+	TWeakObjectPtr<UObject>		Interactor{}; 
+	FFloat32					Timestamp{}; 
+	EInteractionEventTag		InteractionEventTag{};
+	
+	
+	FInteractionEvent(
+		TWeakObjectPtr<UObject> interactable,
+		TWeakObjectPtr<UObject> interactor,
+		FFloat32				timestamp = -1,
+		EInteractionEventTag    interactionEventTag = EInteractionEventTag::IE_Undefined
+		);
+	
+	EInteractionEventTag	GetEventTag() const { return InteractionEventTag; }
+	
+};
+
+/* void(EInteractionEventTag);) */ 
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FEventDelegate, EInteractionEventTag);
+DECLARE_MULTICAST_DELEGATE_OneParam(FItemInteraction, EInteractionEventTag);
 
 UCLASS()
 class LIGHTSOUT_API UInteractionManager : public UWorldSubsystem
@@ -36,8 +66,8 @@ public:
 	virtual void PostInitialize() override;
 	
 	virtual bool ShouldCreateSubsystem(UObject* Outer) const override;
-	
-	bool ConsumeEvent(EInteractionEventTag InteractionEvent) const;
-	// USubsystem implementation End
+
+	/* Handler */ 
+	void ConsumeEvent(const FInteractionEvent& InteractionEvent) const;
 	
 };

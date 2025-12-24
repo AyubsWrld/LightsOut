@@ -3,6 +3,18 @@
 
 #include "InteractionManager.h"
 
+ FInteractionEvent::FInteractionEvent(
+	TWeakObjectPtr<UObject> interactable,
+	TWeakObjectPtr<UObject> interactor,
+	FFloat32				timestamp,
+	EInteractionEventTag    interactionEventTag
+	) 
+		:	Interactable( interactable ) ,
+			Interactor(interactor),
+			Timestamp(timestamp),
+			InteractionEventTag(interactionEventTag)
+{}
+
 constexpr EInteractionEventTag operator|(EInteractionEventTag Lhs, EInteractionEventTag Rhs)
 {
 	using	TUnderlyingType		=		std::underlying_type_t<EInteractionEventTag>;
@@ -11,6 +23,8 @@ constexpr EInteractionEventTag operator|(EInteractionEventTag Lhs, EInteractionE
 
 bool UInteractionManager::ShouldCreateSubsystem(UObject* Outer) const
 {
+ 	//if ( Cast<UWorld>(Outer)->GetNetMode() == NM_Client )
+ 		//return false; 
 	return true; 
 }
 
@@ -30,31 +44,30 @@ void UInteractionManager::BeginDestroy()
 	Super::BeginDestroy();
 }
 
-void UInteractionManager::PostInitialize() override
+void UInteractionManager::PostInitialize() 
 {
 	Super::PostInitialize();
 }
 
-bool UInteractionManager::ConsumeEvent(EInteractionEventTag InteractionEvent) const
+void UInteractionManager::ConsumeEvent(const FInteractionEvent& InteractionEvent) const
 {
 	using	enum	EInteractionEventTag;
 	
-	switch (InteractionEvent)
+	switch (InteractionEvent.GetEventTag())
 	{
-		
 	case IE_Undefined:
-		return true;
+		return ;
 		
 	case IE_EnvironmentInteraction:
-		return true;
+		return ;
 		
 	case IE_ItemInteraction:
-		return true;
+		return ;
 		
 	case IE_Max:
-		return true;
+		return ;
 		
 	}
-	return false; 
+	return; 
 }
 	
