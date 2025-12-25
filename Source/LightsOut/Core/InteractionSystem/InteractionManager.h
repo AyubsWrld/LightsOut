@@ -45,8 +45,8 @@ struct FInteractionEvent
 
 /* void(EInteractionEventTag);) */ 
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FEventDelegate, EInteractionEventTag);
-DECLARE_MULTICAST_DELEGATE_OneParam(FItemInteraction, EInteractionEventTag);
+DECLARE_MULTICAST_DELEGATE_OneParam(FEventDelegate, FInteractionEvent);
+DECLARE_MULTICAST_DELEGATE_OneParam(FItemInteraction, FInteractionEvent);
 
 UCLASS()
 class LIGHTSOUT_API UInteractionManager : public UWorldSubsystem
@@ -54,7 +54,6 @@ class LIGHTSOUT_API UInteractionManager : public UWorldSubsystem
 	
 	GENERATED_BODY()
 	
-	FEventDelegate InteractionEventDelegate; 
 	
 public: 
 
@@ -75,6 +74,6 @@ public:
 	
 	void BindEvent(FEventDelegate Delegate);
 	
-	FEventDelegate& GetEventDelegateHandle() { return InteractionEventDelegate; }
+	void OnInteractionEvent(FInteractionEvent InteractionEvent);
 	
 };

@@ -1,6 +1,9 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "LightsOutCharacter.h"
+
+#include <ThirdParty/libPNG/libPNG-1.5.2/png.h>
+
 #include "LightsOutProjectile.h"
 #include "Animation/AnimInstance.h"
 #include "Components/CapsuleComponent.h"
@@ -36,6 +39,7 @@ ALightsOutCharacter::ALightsOutCharacter()
 	/* Bind Actor Components */
 	
 	InteractorComponent = CreateDefaultSubobject<UInteractorComponent>(TEXT("InteractorComponent"));
+	InteractorComponent->BindOwnerCameraComponent(GetFirstPersonCameraComponent());
 	
 }
 
@@ -155,8 +159,11 @@ void ALightsOutCharacter::ServerHandleEquipRequest_Implementation(AItemBase* Ite
 
 void ALightsOutCharacter::Interact(const FInputActionValue& Value)
 {
-	FRotator Rotation = FirstPersonCameraComponent->GetComponentRotation();
-	ServerHandleInteractionRequest();
+	if (!InteractorComponent) return;
+
+	InteractorComponent->OnInteract();
+	//FRotator Rotation = FirstPersonCameraComponent->GetComponentRotation();
+	//ServerHandleInteractionRequest();
 }
 
 void ALightsOutCharacter::EquipSlot0(const FInputActionValue& Value)

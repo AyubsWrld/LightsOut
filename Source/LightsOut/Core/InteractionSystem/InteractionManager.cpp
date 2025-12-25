@@ -52,24 +52,24 @@ void UInteractionManager::PostInitialize()
 void UInteractionManager::ConsumeEvent(const FInteractionEvent& InteractionEvent) const
 {
 	using	enum	EInteractionEventTag;
-	
+ 	
 	switch (InteractionEvent.GetEventTag())
 	{
 	case IE_Undefined:
 		return ;
-		
 	case IE_EnvironmentInteraction:
 		return ;
-		
 	case IE_ItemInteraction:
 		return ;
-		
 	case IE_Max:
 		return ;
-		
 	}
 	return; 
 }
 
 void UInteractionManager::BindEvent(FEventDelegate Delegate) { return; }
 	
+void UInteractionManager::OnInteractionEvent(FInteractionEvent InteractionEvent)
+{
+	ConsumeEvent(InteractionEvent);
+}
