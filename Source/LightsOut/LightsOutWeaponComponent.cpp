@@ -55,6 +55,8 @@ void ULightsOutWeaponComponent::Fire()
 	}
 	
 	// Try and play a firing animation if specified
+
+	/*
 	if (FireAnimation != nullptr)
 	{
 		// Get the animation object for the arms mesh
@@ -64,6 +66,8 @@ void ULightsOutWeaponComponent::Fire()
 			AnimInstance->Montage_Play(FireAnimation, 1.f);
 		}
 	}
+	*/
+
 }
 
 bool ULightsOutWeaponComponent::AttachWeapon(ALightsOutCharacter* TargetCharacter)
@@ -76,6 +80,8 @@ bool ULightsOutWeaponComponent::AttachWeapon(ALightsOutCharacter* TargetCharacte
 		return false;
 	}
 
+	return false;
+	/*
 	// Attach the weapon to the First Person Character
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 	AttachToComponent(Character->GetMesh1P(), AttachmentRules, FName(TEXT("GripPoint")));
@@ -97,6 +103,7 @@ bool ULightsOutWeaponComponent::AttachWeapon(ALightsOutCharacter* TargetCharacte
 	}
 
 	return true;
+	*/
 }
 
 void ULightsOutWeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)

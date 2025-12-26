@@ -98,10 +98,12 @@ void ABoard::Tick(float DeltaTime)
 
 	if (bQueryIsInterest)
 	{
+		/* 
 		if (IsViewInterest())
 		{
 			//Highlight();
 		}
+		*/
 	}
 }
 
@@ -327,41 +329,7 @@ void ABoard::Interact(APlayerState* Player)
 	UBoardManager* BoardManager{ GetWorld()->GetSubsystem<UBoardManager>() };
 	BoardManager->ServerHandleRequest(Player, this);
 }
-bool ABoard::IsViewInterest()
-{
-	FHitResult HitResult; 
-	FCollisionQueryParams Parameters; 
 
-	for (TObjectPtr<ALightsOutCharacter> Player : PlayersInColliderVolume)
-	{
-		if (const UCameraComponent* const PlayerCamera{ Player->GetFirstPersonCameraComponent() }; PlayerCamera)
-		{
-			Parameters.AddIgnoredActor(Player);
-			FVector    Start{ PlayerCamera->GetComponentLocation() };
-			GetWorld()->LineTraceSingleByChannel(
-				HitResult,
-				Start,
-				Start + (PlayerCamera->GetForwardVector() * 1000.0f),
-				ECollisionChannel::ECC_WorldDynamic,
-				Parameters
-			);
-
-			if (UPrimitiveComponent* P{ HitResult.GetComponent() }; P )
-			{
-				DrawDebugBox(GetWorld(), P->GetComponentLocation(), FVector{50.0f, 50.0f, 10.0f }, FColor::Cyan , false, 0.1f, 0.0f, 2.0f);
-			}
-
-			if (HitResult.bBlockingHit && IsValid(HitResult.GetActor()))
-			{
-				if (ABoard* Board{ Cast<ABoard>(HitResult.GetActor()) }; Board)
-				{
-					return true;
-				}
-			}
-		}
-	}
-	return false;
-}
 void cb(AActor* A = nullptr)
 {
 	UE_LOG(LogTemp, Warning, TEXT("[%s]: Invocable stub called"), ANSI_TO_TCHAR(__FUNCTION__));

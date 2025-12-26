@@ -14,6 +14,7 @@
 #include "LightsOut/Core/MinigameManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/LocalPlayer.h"
+#include "GameFramework/SpringArmComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -24,22 +25,19 @@ ALightsOutCharacter::ALightsOutCharacter()
 {
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
 
-	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
-	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
-	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
-	FirstPersonCameraComponent->bUsePawnControlRotation = true;
+	ThirdPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("ThirdPersonCamera"));
+	ThirdPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
+	ThirdPersonCameraComponent->bUsePawnControlRotation = true;
+	
+	/* Camera Springarm */ 
 
-	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
-	Mesh1P->SetOnlyOwnerSee(false);
-	Mesh1P->SetupAttachment(FirstPersonCameraComponent);
-	Mesh1P->bCastDynamicShadow = false;
-	Mesh1P->CastShadow = false;
-	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
-
+	ThirdPersonSpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
+	ThirdPersonSpringArmComponent->SetupAttachment(RootComponent);
+	ThirdPersonCameraComponent->SetupAttachment(ThirdPersonSpringArmComponent);
 	/* Bind Actor Components */
 	
 	InteractorComponent = CreateDefaultSubobject<UInteractorComponent>(TEXT("InteractorComponent"));
-	InteractorComponent->BindOwnerCameraComponent(GetFirstPersonCameraComponent());
+	InteractorComponent->BindOwnerCameraComponent(GetThirdPersonCameraComponent());
 	
 }
 
@@ -131,7 +129,7 @@ void ALightsOutCharacter::ServerHandleInteractionRequest_Implementation()
 	FRotator Rotation = PlayerController->GetControlRotation().GetNormalized();
 	Parameters.AddIgnoredActor(this);
 
-	FVector Start = FirstPersonCameraComponent->GetComponentLocation();
+	FVector Start = ThirdPersonCameraComponent->GetComponentLocation();
 	FVector End = Start + Rotation.Vector() * 300.0f; 
 
 	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Pawn, Parameters);
@@ -232,7 +230,7 @@ void ALightsOutCharacter::BeginPlay()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	ItemBroker				=	GetWorld()->GetSubsystem<UIBSingleton>();
-	CameraScanner			=	MakeUnique<FCameraHitScanner>(FirstPersonCameraComponent, GetWorld(), this);
+	CameraScanner			=	MakeUnique<FCameraHitScanner>(ThirdPersonCameraComponent, GetWorld(), this);
 
 	/* Hud Logic
 	if (IsLocallyControlled() && Controller)

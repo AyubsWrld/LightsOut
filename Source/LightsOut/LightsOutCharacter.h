@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Logging/LogMacros.h"
 #include "Camera/CameraComponent.h"
 #include "Generics/Interactable.h"
@@ -14,11 +15,11 @@
 #include "LightsOut/PlayerComponents/Inventory.h"
 #include "LightsOutCharacter.generated.h"
 
-class UInputComponent;
-class USkeletalMeshComponent;
-class UInputAction;
-class UInputMappingContext;
-struct FInputActionValue;
+class	UInputComponent;
+class	USkeletalMeshComponent;
+class	UInputAction;
+class	UInputMappingContext;
+struct	FInputActionValue;
 
 struct FCameraHitScanner
 {
@@ -70,14 +71,18 @@ class ALightsOutCharacter : public ACharacter
 	GENERATED_BODY()
 
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Mesh, meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* Mesh1P;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Mesh, meta = (AllowPrivateAccess = "true"))
+	//USkeletalMeshComponent* Mesh1P;
 	
 	UInteractorComponent* InteractorComponent;  // Maybe Swap out for non-raw pointers 
 	
-	/** First person camera */
+	/** Third person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* FirstPersonCameraComponent;
+	UCameraComponent* ThirdPersonCameraComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	USpringArmComponent* ThirdPersonSpringArmComponent;
+	
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
@@ -165,9 +170,10 @@ protected:
 
 public:
 	/** Returns Mesh1P subobject **/
-	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
+	//USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	/** Returns FirstPersonCameraComponent subobject **/
-	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+	UCameraComponent*		GetThirdPersonCameraComponent() const	{ return ThirdPersonCameraComponent; }
+	USpringArmComponent*	GetCameraSpringArm()			const	{ return ThirdPersonSpringArmComponent; }
 
 };
 

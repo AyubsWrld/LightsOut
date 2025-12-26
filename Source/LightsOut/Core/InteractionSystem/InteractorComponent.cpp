@@ -81,12 +81,12 @@ void UInteractorComponent::BindInteractionManager()
 		HitResult,
 		StartLocation,
 		EndLocation,
-		ECollisionChannel::ECC_WorldStatic
+		ECollisionChannel::ECC_WorldStatic,
+		CollisionParameters
 		) )
 	{
 		if ( HitActor = HitResult.GetActor() ; HitActor)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("It Worked"));
 		}
 	}
 	

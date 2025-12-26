@@ -94,6 +94,7 @@ void UBoardManager::ServerHandleRequest_Implementation(APlayerState* Player, ABo
 		return;
 	}
 
+	/*
 	if (ALightsOutCharacter* Character{ Cast<ALightsOutCharacter>(PC->GetPawn()) }; Character)
 	{
 		UCameraComponent* Camera = Character->GetFirstPersonCameraComponent();
@@ -121,6 +122,7 @@ void UBoardManager::ServerHandleRequest_Implementation(APlayerState* Player, ABo
 	}
 	UpdateBoardState();
 	UpdateCurrentPlayerIndex();
+	*/
 }
 
 void UBoardManager::MulticastGreetPlayers_Implementation() const
