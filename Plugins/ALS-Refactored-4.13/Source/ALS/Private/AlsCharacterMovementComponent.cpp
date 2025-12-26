@@ -166,7 +166,9 @@ UAlsCharacterMovementComponent::UAlsCharacterMovementComponent()
 
 	NavAgentProps.bCanCrouch = true;
 	NavAgentProps.bCanFly = true;
-	bUseAccelerationForPaths = true;
+	// TODO: Commented this out as it appears that it is not referenced elsewhere, uncomment and actually try fixing should this break something. 
+	//bUseAccelerationForPaths = true;
+	NavMovementProperties.bUseAccelerationForPaths = true;
 }
 
 #if WITH_EDITOR
@@ -426,9 +428,14 @@ void UAlsCharacterMovementComponent::PhysWalking(const float DeltaTime, int32 It
 		if ( bCheckLedges && !CurrentFloor.IsWalkableFloor() )
 		{
 			// calculate possible alternate movement
+		
+			
 			const FVector GravDir = GetGravityDirection();
-			const FVector NewDelta = bTriedLedgeMove ? FVector::ZeroVector : GetLedgeMove(OldLocation, Delta, GravDir);
-			if ( !NewDelta.IsZero() )
+			/* Checks if player requested a move towards a ledge, if so -> set delta to zerovector? otherwise get ledge move and set newdelta to it*/ 
+			// TODO: Change this back to the original cotrol paths should this error out 
+			//const FVector NewDelta = bTriedLedgeMove ? FVector::ZeroVector : GetLedgeMove(OldLocation, Delta, GravDir);
+			const FVector NewDelta = bTriedLedgeMove ? FVector::ZeroVector : FVector::ZeroVector;
+			if ( !NewDelta.IsZero() ) // This control path is never triggered as a result. 
 			{
 				// first revert this move
 				RevertMove(OldLocation, OldBase, PreviousBaseLocation, OldFloor, false);
